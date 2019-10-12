@@ -1,0 +1,502 @@
+<!-- Horizontal Form -->
+<div class="box box-info">
+  <div class="box-header with-border">
+    <h3 class="box-title">问卷编辑页面</h3>
+    <div class="box-tools">
+	  <div class="input-group input-group-sm" style="width: 80px;">
+		<button type="button" class="btn btn-default btn-select-ques">添加问题</button>
+	  </div>
+	</div>
+  </div>
+</div>
+<!-- /.box-header -->
+<!-- form start -->
+<form class="form-horizontal">
+  <div id="dbody" class="box-body" style="background:#FFFFFF;">
+  	<div class="form-group">
+      <label for="paperName" class="col-sm-2 control-label">问卷名称:</label>
+      <div class="col-sm-10">
+      	<input type="text" id="paperName" style="width: 60%;" placeholder="请用英文和数字命名">
+      	<input type="radio" name="paperLanguage" value="eng">英文 
+      	<input type="radio" name="paperLanguage" value="ch">中文 
+      </div>
+    </div>
+    <div class="form-group" style="display:none;">
+      <label for="quesSum" class="col-sm-2 control-label">作答总题数:</label>
+      <div class='col-sm-10'>
+        <input type="text" onkeyup="this.value=this.value.replace(/\D/g,'')" 
+        	id="quesSum" style="width:50px; height:30%;" placeholder="请输入">&nbsp;题
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="paperTitle" class="col-sm-2 control-label">问卷标题:</label>
+      <div class="col-sm-10">
+        <textarea id="paperTitle" style="width:80%; height:30%;"></textarea>
+      </div>
+    </div>
+    <div class="form-group">
+      <label for="greet" class="col-sm-2 control-label">欢迎内容:</label>
+      <div class="col-sm-10">
+        <textarea id="greet" style="width:80%; height:30%;"></textarea>
+      </div>
+    </div>
+    <div id="quesDivs"></div>
+    <div class="form-group">
+      <label for="thank" class="col-sm-2 control-label">感谢内容:</label>
+      <div class="col-sm-10">
+        <textarea id="thank" style="width:80%; height:30%;"></textarea>
+      </div>
+    </div>
+  </div>
+  <!-- /.box-body -->
+  <div class="box-footer">
+    <button type="button" class="btn btn-default btn-cancel">Cancel</button>
+    <button type="button" class="btn btn-info pull-right btn-save">Save</button>
+  </div>
+  <!-- /.box-footer -->
+</form>
+<script type="text/javascript" src="bower_components/layer/layer.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	doInitFormData();
+	$(".box-tools").on("click", ".btn-select-ques", doSelectQuesUI);
+	$(".box-footer")
+		.on("click", ".btn-save", doSaveOrUpdate)
+		.on("click", ".btn-cancel", doCancel);
+	$("#quesDivs")
+		.on("click", ".btn-delete", doDeleteQues)
+		.on("click", ".btn-shiftup", doShiftUpQues)
+		.on("click", ".btn-shiftdown", doShiftDownQues);
+});
+
+//==============
+//初始化数据操作
+//==============
+function doInitFormData(){
+	//显示分支作答总题数输入框
+	if($(".box-title").html() === "创建分支问卷" || $(".box-title").html() === "修改分支问卷"){
+		$("#quesSum").parent().parent().show();
+	}
+	//修改问卷时根据ID获取问卷的Data数据
+	var data = $("#mainContentId").data("paperData");
+	if(!data){
+		return;
+	}
+	//初始化问卷基本数据
+	$("#paperName").val(data.paperName);
+	$("#paperTitle").val(data.paperTitle);
+	$("#greet").val(data.greet);
+	$("#thank").val(data.thank);
+	if($(".box-title").html() === "创建分支问卷" || $(".box-title").html() === "修改分支问卷"){
+		$("#quesSum").val(data.quesSum);
+	}
+	if(data.paperLanguage === "eng"){
+		$("div input[name='paperLanguage']").eq(0).prop("checked", true);
+	}else if(data.paperLanguage === "ch"){
+		$("div input[name='paperLanguage']").eq(1).prop("checked", true);
+	}
+	var ids = $("#mainContentId").data("ids");
+	var params = {"quesIds" : ids == null ? data.quesIds.toString() : ids.toString()}
+	var url = "paper/doSelectQues";
+	$.post(url, params, function(result){
+		$("#mainContentId").data("quesData", result.data);
+		if(ids){
+			$("#mainContentId").removeData("ids");
+		}
+		doInitQuesDate();
+	});
+}
+//初始化问题数据
+function doInitQuesDate(){
+	//创建问卷时获取问题后的Data数据
+	var data = $("#mainContentId").data("quesData");
+	if(!data){
+		return;
+    }
+	for(var a in data){
+		var quesInfo = data[a];
+		doAddQuesName(quesInfo.quesId, quesInfo.quesType);
+		$(".quesName").eq(a).html(quesInfo.quesName);
+		var quesDiv = $(".quesDiv").eq(a);
+		for(var i = 0; i < quesInfo.options.length; i++){
+			doAddOption(quesInfo.options[i], quesInfo.optionIds[i], quesInfo.quesType, quesDiv, quesInfo.quesId, quesInfo.flags[i]);
+		}
+		if(quesInfo.quesType === "03"){
+			doAddEsay(quesDiv);
+		}
+		if(quesInfo.must == 0){
+			$(".is-must").eq(a).hide();//隐藏必作答标识
+		}
+	}
+	autoAddNumber();
+	$(".flag").each(function(){
+		if($(this).val() == 1){
+			$(this).show();//显示
+			$(this).val("");
+		}
+	});
+	addSelectOption();
+}
+function doAddQuesName(quesId, quesType){
+	var quesDivs = $("#quesDivs");
+	var quesNameDiv =
+		"<div class='quesDiv'  style='border:2px solid #DDDDDD;'>"+
+			"<div class='form-group'>"+
+    			"<label class='col-sm-2 control-label numberClass'></label>"+
+    			"<div class='col-sm-10'>"+
+    				"<span style='color:red;' class='is-must'>*</span>"+
+    				"<input class='quesId' value='"+quesId+"' style='display:none;'/>"+
+    				"<input class='quesType' value='"+quesType+"' style='display:none;'/>"+
+    				"<span class='quesName'></span>"+
+    				"<div style='float:right;'>"+
+	    				"<button type='button' class='btn-delete'>删除</button>"+
+	    				"<button type='button' class='btn-shiftup'>上移</button>"+
+	    				"<button type='button' class='btn-shiftdown'>下移</button>"+
+    				"</div>"+
+    			"</div>"+
+    		"</div>"+
+    	"</div>";
+    quesDivs.append(quesNameDiv);
+}
+function doAddOption(options, optionId, type, quesDiv, quesId, flag){
+	if(type === "01"){
+		var optionDiv = 
+			"<div class='form-group'>"+
+				"<label class='col-sm-2 control-label'></label>"+
+				"<div class='col-sm-10'>"+
+					"<input type='radio' class='optionId' name='optionName"+quesId+"' value='"+optionId+"'><span class='optionContent'>"+options+"</span>"+
+					"<input type='text' class='flag' value='"+flag+"' style='width: 30%; display:none;' placeholder='仅限10个中文字符！'>"+
+					"<select class='select-ques' style='display:none;'></select>"+
+				"</div>"+
+			"</div>";
+		quesDiv.append(optionDiv);
+	}else if(type === "02"){
+		var optionDiv = 
+			"<div class='form-group'>"+
+				"<label class='col-sm-2 control-label'></label>"+
+				"<div class='col-sm-10'>"+
+					"<input type='checkbox' class='optionId' value='"+optionId+"'><span class='optionContent'>"+options+"</span>"+
+					"<input type='text' class='flag' value='"+flag+"' style='width: 30%; display:none;' placeholder='仅限10个中文字符！'>"+
+					"<select class='select-ques' style='display:none;'></select>"+
+				"</div>"+
+			"</div>";
+		quesDiv.append(optionDiv);
+	}
+}
+function doAddEsay(quesDiv){
+	var optionDiv = 
+		"<div class='form-group'>"+
+			"<label class='col-sm-2 control-label'></label>"+
+			"<div class='col-sm-10'>"+
+				"<textarea class='esayResult' style='width: 50%;height: 30%;' placeholder='仅限40个中文字符！'></textarea>"+
+				"<select class='select-ques' style='display:none;'></select>"+
+			"</div>"+
+		"</div>";
+	quesDiv.append(optionDiv);
+}
+//自增序列号
+function autoAddNumber(){
+	function number(){
+	    var index = 0;
+    	for(var i = 0;i < $(".numberClass").length; i++){
+			$(".numberClass").get(index).innerHTML = i+1;
+			index++;
+    	}
+	}
+	number();
+}
+//分支问卷添加选项后添加后续问题选择项
+function addSelectOption(){
+	//分支问卷部分
+	if($(".box-title").html() === "创建分支问卷" || $(".box-title").html() === "修改分支问卷"){
+		$(".select-ques").each(function(){
+			$(this).show();//显示选择列表
+			for(var i = 0; i <= $(".quesDiv").length; i++){
+				if(i != 1){
+					var option = "<option value='"+i+"'>"+i+"</option>";
+					$(this).append(option);
+				}
+			}
+		});
+	}
+	//分支问卷修改部分
+	if($(".box-title").html() === "修改分支问卷"){
+		var data = $("#mainContentId").data("paperData");
+		var url = "paper/doGetPaperQuesOption";
+		var params = {"paperId" : data.paperId}
+		$.getJSON(url, params, function(result){
+			for(var i in result.data){
+				$(".quesDiv").each(function(){
+					if($(this).find(".quesId").val() === result.data[i].quesId+""){
+						if($(this).find(".quesType").val() === "01" 
+								|| $(this).find(".quesType").val() === "02"){
+							$(this).find(".optionId").each(function(){
+								if($(this).val() === result.data[i].optionId+""){
+									$(this).parent().find(".select-ques").val(result.data[i].selectNum);
+								}
+							});			
+						}else if($(this).find(".quesType").val() === "03"){
+							$(this).find(".select-ques").val(result.data[i].selectNum);
+						}
+					}
+				});
+			}
+		});
+	}
+}
+
+//====================
+//跳转添加问题页面操作
+//====================
+function doSelectQuesUI(){
+	var paperData = $("#mainContentId").data("paperData");
+	var data = {
+		"paperId" : paperData == null ? null : paperData.paperId,
+		"paperName" : $("#paperName").val(),
+		"paperLanguage" : doGetLanguage(),
+		"paperTitle" : $("#paperTitle").val(),
+		"greet" : $("#greet").val(),
+		"thank" : $("#thank").val(),
+	}
+	if($(".box-title").html() === "创建分支问卷" || $(".box-title").html() === "修改分支问卷"){
+		data.quesSum = $("#quesSum").val();
+	}
+	$("#mainContentId").removeData("paperData");
+	$("#mainContentId").data("paperData", data);
+	var quesIds = [];
+	$(".quesId").each(function(){
+		quesIds.push($(this).val());
+	});
+	//console.log(quesIds);
+	$("#mainContentId").data("ids", quesIds.toString());
+	$("#mainContentId").data("title", $(".box-title").html());
+	var title = $(".box-title").html() + ">添加问题";
+	$("#mainContentId").load("paper/doSelectQuesUI", function(){
+		$(".box-title").html(title);
+	});
+}
+
+//==================
+//问题移动和删除操作
+//==================
+//删除后重置QuesIds
+function doInitQuesIds(){
+	$("#mainContentId").removeData("ids");
+	var ids = [];
+	$(".quesId").each(function(){
+		if($(this).val() != null){
+			ids.push($(this).val());
+		}
+	});
+	$("#mainContentId").data("ids", ids.toString());
+}
+//删除问题操作
+function doDeleteQues(){
+	$(this).parent().parent().parent().parent().remove();
+	autoAddNumber();
+	doInitQuesIds();
+}
+//上移操作
+function doShiftUpQues(){
+	var index = $(this).parent().parent().parent().parent().index();
+	if(index === 0){
+		alert("已在最上面");
+		return;
+	}
+	var arr = $("#quesDivs").find(".quesDiv").toArray();
+	var temp;
+    temp = arr[index];
+    arr[index] = arr[index-1];
+    arr[index-1] = temp;
+    $("#quesDivs").html(arr);
+    autoAddNumber();
+}
+//下移操作
+function doShiftDownQues(){
+	var index = $(this).parent().parent().parent().parent().index();
+	var arr = $("#quesDivs").find(".quesDiv").toArray();
+	if(index === arr.length-1){
+		alert("已在最下面");
+		return;
+	}
+	var temp;
+    temp = arr[index];
+    arr[index] = arr[index+1];
+    arr[index+1] = temp;
+    $("#quesDivs").html(arr);
+    autoAddNumber();
+}
+
+//==============
+//返回操作
+//==============
+//刷新数据,重定向paper_list.html页面
+function doCancel(){
+	$("#mainContentId").removeData("paperData");
+	$("#mainContentId").removeData("quesData");
+	$("#mainContentId").removeData("ids");
+	$("#mainContentId").removeData("title");
+	$("#mainContentId").load("paper/doPaperListUI");
+}
+
+//==============
+//保存和修改操作
+//==============
+function doSaveOrUpdate(){
+	var data = $("#mainContentId").data("paperData");
+	if(doValidated()){
+		var params = getDataParam();
+		if(data.paperId != null){
+			params.paperId = data.paperId;
+		}
+		var insertUrl = "paper/doAddPaper";
+		var updateUrl = "paper/doUpdatePaper";
+		var url = data.paperId != null ? updateUrl : insertUrl;
+		$.post(url, params, function(result){
+			if(result.state == 1){
+				alert(result.message);
+				doCancel();
+			}else{
+				alert(result.message);
+			}
+		});
+	}
+}
+//获取需要的参数
+function getDataParam(){
+	var quesNum = [];
+	$(".numberClass").each(function(){
+		quesNum.push($(this).html());
+	});
+	var quesIds = [];
+	$(".quesId").each(function(){
+		quesIds.push($(this).val());
+	});
+	var type;
+	if($(".box-title").html() === "创建单张问卷" || $(".box-title").html() === "修改单张问卷"){
+		type = "01";
+	}else if($(".box-title").html() === "创建分支问卷" || $(".box-title").html() === "修改分支问卷"){
+		type = "02";
+	}
+	var params = {
+		"paperName" : $("#paperName").val(),
+		"paperType" : type,
+		"paperLanguage" : doGetLanguage(),
+		"quesNum" : quesNum.toString(),
+		"quesIds" : quesIds.toString(),
+		"paperTitle" : $("#paperTitle").val(),
+		"greet" : $("#greet").val(),
+		"thank" : $("#thank").val(),
+	}
+	//分支问卷部分
+	if($(".box-title").html() === "创建分支问卷" || $(".box-title").html() === "修改分支问卷"){
+		var quesOption = new Array();
+		var selectQues = new Array();
+		for(var i=0; i < quesIds.length; i++){
+			$(".quesDiv").each(function(){
+				if(quesIds[i] == $(this).find(".quesId").val()){
+					//获取选项ID组
+					var optionIds = [];
+					$(this).find(".optionId").each(function(){
+						optionIds.push($(this).val());
+					});
+					//获取选择题序组
+					var quesNums = [];
+					$(this).find(".select-ques").each(function(){
+						quesNums.push($(this).val());
+					});
+					var sym = "";
+					//判断最后一个不需要添加分割符;
+					if(quesIds.length != (i+1)){
+						sym = ";";
+					}
+					if(optionIds.length > 0){
+						//选项题操作
+						//将选项ID组添加到题目选项集数组中
+						quesOption[i] = optionIds.toString()+sym;
+						//将选项指定下一题的序号组添加到题目序号集数组中
+						selectQues[i] = quesNums.toString()+sym;
+					}else{
+						//填空题操作
+						//填空题没有选项ID，默认添加“0”到题目选项集数组中
+						quesOption[i] = "0"+sym;
+						//将选项指定下一题的序号组添加到题目序号集数组中
+						selectQues[i] = quesNums.toString()+sym;
+					}	
+				}
+			});
+		}
+		params.quesOptionStr = quesOption.toString();
+		params.selectQuesStr = selectQues.toString();
+		var quesTypes = [];
+		$(".quesType").each(function(){
+			quesTypes.push($(this).val());
+		});
+		params.quesTypes = quesTypes.toString();
+		params.quesSum = $("#quesSum").val();
+	}
+	return params;
+}
+function doGetLanguage(){
+	return $("div input[name='paperLanguage']:checked").val();
+}
+//提交前校验
+function doValidated(){
+	var valid = true;
+	if($(".quesId").length == 0){
+		alert("问题数不能为0！！");
+		valid = false;
+	}
+	if($("#paperName").val() == null || $("#paperName").val() == ""){
+		alert("问卷名称不能为空！！");
+		valid = false;
+	}
+	if(doGetLanguage() == null){
+		alert("语言选择不能为空！！");
+		valid = false;
+	}
+	if($("#paperTitle").val() == null || $("#paperTitle").val() == ""){
+		alert("问卷标题不能为空！！");
+		valid = false;
+	}
+	if($("#greet").val() == null || $("#greet").val() == ""){
+		alert("欢迎内容不能为空！！");
+		valid = false;
+	}
+	if($("#thank").val() == null || $("#thank").val() == ""){
+		alert("感谢不能为空！！");
+		valid = false;
+	}
+	if($(".box-title").html() === "创建分支问卷" || $(".box-title").html() === "修改分支问卷"){
+		if($("#quesSum").val() == null || $("#quesSum").val() == ""){
+			alert("分支作答总题数不能为空！！");
+			valid = false;
+		}
+	}
+	$(".quesDiv").each(function(){
+		var be = false;
+		$(this).find(".select-ques").each(function(){
+			if($(this).val() === "0"){
+				be = true;
+			}
+		});
+		if(be){
+			var count = 0;
+			$(this).find(".select-ques").each(function(){
+				if($(this).val() === "0"){
+					count++;
+				}
+			});
+			if($(this).find(".select-ques").length == count){
+			}else{
+				alert("0为最后一题标识，选项后的序号设置必须全部同一为0");
+				valid = false;
+			}	
+		}
+	});
+	return valid;
+}
+//console.log();
+//alert();
+//debugger;
+</script>

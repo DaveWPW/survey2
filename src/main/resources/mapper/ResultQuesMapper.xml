@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dave.dao.ResultQuesDao">
+    <insert id="addResultQues" parameterType="com.dave.entity.ResultQues">
+     	insert into su_result_ques
+      	(result_id, ques_num, ques_id, ques_type, ques_name, option_content)
+      	values
+		(#{resultId}, #{quesNum}, #{quesId}, #{quesType}, #{quesName}, #{optionContent})
+	</insert>
+</mapper>

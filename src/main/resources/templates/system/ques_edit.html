@@ -1,0 +1,184 @@
+<!-- Horizontal Form -->
+<div class="box box-info">
+  <div class="box-header with-border">
+    <h3 class="box-title">问题编辑页面</h3>
+    <div class="box-tools">
+	  <div class="input-group input-group-sm" style="width: 80px;">
+		<button type="button" class="btn btn-default btn-add-option">添加选项</button>
+	  </div>
+	</div>
+  </div>
+</div>
+<!-- /.box-header -->
+<!-- form start -->
+<form class="form-horizontal">
+  <div class="box-body" style="background:#FFFFFF;">
+    <div class="form-group">
+      <label for="quesName" class="col-sm-2 control-label">题目:</label>
+      <div class="col-sm-10">
+        <textarea id="quesName" style="width: 80%;height: 30%;"></textarea>
+        <br/>
+      	<input type='checkbox' name='is-must' value='1'>必须作答
+      </div>
+    </div>
+    <div id="optionDiv"></div>
+  </div>
+  <!-- /.box-body -->
+  <div class="box-footer">
+    <button type="button" class="btn btn-default btn-cancel">Cancel</button>
+    <button type="button" class="btn btn-info pull-right btn-save">Save</button>
+  </div>
+  <!-- /.box-footer -->
+</form>
+<script type="text/javascript" src="bower_components/layer/layer.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	doInitFormData();
+	$(".box-tools").on("click", ".btn-add-option", doAddOption);
+	$(".box-footer")
+		.on("click", ".btn-cancel", doCancel)
+		.on("click", ".btn-save", doAddOrUpdate);
+	$("#optionDiv").on("click", ".btn-delete-option", doDeleteOption)
+});
+function doAddOption(){
+	var optionDiv = $("#optionDiv");
+	var divs = 
+		"<div class='form-group'>"+
+			"<label class='col-sm-2 control-label'>选项:</label>"+
+			"<div class='col-sm-10'>"+
+				"<input type='text' class='form-control optionContent' style='width: 80%;'>"+
+				"<input type='checkbox' class='is-blanks' value='1'>可填空"+
+				"<button type='button' style='margin-left: 66%;' class='btn-delete-option'>删除</button>"+
+			"</div>"+
+		"</div>";
+	optionDiv.append(divs);
+}
+function doDeleteOption(){
+	$(this).parent().parent().remove();
+} 
+//刷新数据,重定向Quesr页面
+function doCancel(){
+	$("#mainContentId").removeData("rowData");
+	if($(".box-title").html() === "查看单选题" || $(".box-title").html() === "查看多选题" 
+		|| $(".box-title").html() === "查看简答题"){
+		$("#mainContentId").load("paper/doSelectQuesUI");//跳转回paper_select_ques.html
+	}else{
+		$("#mainContentId").load("ques/doQuesListUI");//跳转回ques_list.html
+	}
+}
+function getQuesData(){
+	var options = [];
+	$(".optionContent").each(function(){
+		if($(this).val() != null){
+			options.push($(this).val());
+		}
+	});
+	var flags = [];
+	$("#optionDiv input[type='checkbox").each(function(){
+		if($(this).prop("checked")){
+			flags.push(1);
+		}else{
+			flags.push(0);
+		}
+	});
+	var type;
+	var title = $(".box-title").html();
+	if(title === "添加单选题" || title === "修改单选题"){
+		type = "01";
+	}else if(title === "添加多选题" || title === "修改多选题"){
+		type = "02";
+	}else if(title === "添加简答题" || title === "修改简答题"){
+		type = "03";
+	}
+	var params = {
+		"options" : options.toString(),
+		"flags" : flags.toString(),
+		"quesName" : $("#quesName").val(),
+		"quesType" : type,
+		"must" : $("input[name='is-must']:checked").val()==null ? 0:1,
+	}
+	return params;
+}
+//提交校验
+function doValidated(){
+	var valid = true;
+	$(".optionContent").each(function(){
+		if($(this).val() == null || $(this).val() == ""){
+			alert("选项不能为空！！");
+			valid = false;
+		}
+	});
+	if($("#quesName").val() == null || $("#quesName").val() == ""){
+		alert("题目不能为空！！");
+		valid = false;
+	}
+	return valid;
+}
+//添加和修改
+function doAddOrUpdate(){
+	if(doValidated()){
+		var rowData = $("#mainContentId").data("rowData");
+		var params = getQuesData();
+		if(rowData){
+			params.quesId = rowData.quesId;
+		}
+		var insertUrl = "ques/doAddQues";
+		var updateUrl = "ques/doUpdateQues";
+		var url = rowData ? updateUrl : insertUrl;
+		$.post(url, params, function(result){
+			if(result.state == 1){
+				alert(result.message);
+				doCancel();
+			}else{
+				alert(result.message);
+			}
+		})
+	}
+}
+function doInitFormData(){
+    var data = $("#mainContentId").data("rowData");
+    if(!data){
+    	doInitButtonStatus();
+    	return;
+    }
+	$("#quesName").val(data.quesName);
+	if(data.must == 1){
+		$("input[name='is-must']").prop("checked", true);
+	}
+	for(var i = 0; i < data.options.length; i++){
+		doAddOption();
+		$(".optionContent").eq(i).val(data.options[i]);
+		if(data.flags[i] === 1){
+			$("#optionDiv input[type='checkbox']").eq(i).prop("checked", true);
+		}else if(data.flags[i] === 0){
+			$("#optionDiv input[type='checkbox']").eq(i).prop("checked", false);
+		}
+	}
+	doInitButtonStatus();
+}
+function doInitButtonStatus(){
+	if($(".box-title").html() === "添加简答题" 
+			|| $(".box-title").html() === "修改简答题"
+			|| $(".box-title").html() === "查看单选题" 
+			|| $(".box-title").html() === "查看多选题" 
+			|| $(".box-title").html() === "查看简答题"){
+		$(".btn-add-option").hide();//隐藏添加选项按钮
+		if($(".box-title").html() === "查看单选题" 
+				|| $(".box-title").html() === "查看多选题" 
+				|| $(".box-title").html() === "查看简答题"){
+			$(".btn-delete-option").hide();//隐藏选项删除按钮
+			$(".btn-save").hide();//隐藏保存按钮
+		}else{
+			//$(".btn-delete-option").show();//显示选项删除按钮
+			$(".btn-save").show();//显示保存按钮
+		}
+	}else{
+		$(".btn-add-option").show();//显示添加选项按钮
+		$(".btn-delete-option").show();//显示选项删除按钮
+		$(".btn-save").show();//显示保存按钮
+	}
+}
+//console.log();
+//alert();
+//debugger;
+</script>

@@ -1,0 +1,252 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="box">
+	  <div class="box-header">
+	    <h3 class="box-title">调查问题管理</h3>
+	    <div class="box-tools">
+		  <div style="float:right; border:2px solid #DDDDDD;">
+		    <form id="form_table" method="post" enctype="multipart/form-data">
+		      <input style="width:175px;" id="file_excel" type="file" name="filename"accept=".xls,.xlsx"></input>
+		    </form>
+		  </div>
+		  <div class="input-group input-group-sm" style="width:650px; margin-right:190px;">
+		    <input type="text" name="table_search" id="searchNameId"
+				  class="form-control pull-right" placeholder="请输入问题名称">
+			<div class="input-group-btn">
+			  <button type="button" class="btn btn-default btn-search">
+                <i class="fa fa-search"></i>
+			  </button>
+			  <button type="button" class="btn btn-default btn-add-single">添加单选题</button>
+			  <button type="button" class="btn btn-default btn-add-multiple">添加多选题</button>
+				<button type="button" class="btn btn-default btn-add-easy">添加简答题</button>
+				<button type="button" class="btn btn-default btn-import">导入</button>
+				<button type="button" class="btn btn-default btn-delete">删除</button>
+			</div>
+		  </div>
+	    </div>
+	  </div>
+	  <!-- /.box-header -->
+	  <div class="box-body table-responsive no-padding">
+	    <table class="table table-hover text-center">
+	      <thead>
+		    <tr>
+		      <th><input type="checkbox" id="checkAllId">全选</th>
+			  <th>编号</th>
+			  <th>问题名称</th>
+			  <th>问题类型</th>
+			  <th>创建日期</th>
+		    </tr>
+		  </thead>
+		  <tbody id="tbodyId"></tbody>
+	    </table>
+	  </div>
+	  <!-- /.box-body --> 
+	  <div id="pageId" class="box-footer clearfix"></div>
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+$(function(){
+	//加载分页组件
+	$("#pageId").load("doPageUI", function(){
+		//加载页面数据
+		doGetObjects();
+	});
+	$("#checkAllId").change(doChangeTBodyCheckBoxState);
+	$("#tbodyId").on("change", ".quesId", doChangeTHeadCheckBoxState);
+	$(".input-group-btn")
+		.on("click",".btn-search", doQueryObjects)
+		.on("click",".btn-add-single,.btn-add-multiple,.btn-add-easy", doLoadEditUI)
+		.on("click",".btn-delete", doDeleteQues)
+		.on("click",".btn-import", doImportQues);
+});
+//页面显示数据操作================================================================
+//处理查询按钮事件
+function doQueryObjects(){
+	$("#pageId").data("pageCurrent", 1);
+	doGetObjects();
+}
+//页面加载完成异步加载当前页数据
+function doGetObjects(){
+	var url = "ques/doFindQuesList";
+	var pageCurrent = $("#pageId").data("pageCurrent");
+	if(!pageCurrent)pageCurrent = 1;
+	var params = {"pageCurrent" : pageCurrent}
+	params.quesName = $("#searchNameId").val().trim();
+	$.getJSON(url, params, function(result){
+		doHandleResponseResult(result);
+	});
+}
+function doHandleResponseResult(result){
+	if(result.state == 1){
+		doSetTableBodyRows(result.data.records);
+		doSetPagination(result.data);
+		autoAddNumber();//自增序列号
+        doChangeTHeadCheckBoxState();//重置复选框
+	}else{
+		alert(result.message);
+	}
+}
+//通过服务端返回的数据初始化页面
+function doSetTableBodyRows(data){
+	//1.获取tbody对象，并清空内容
+	var tBody = $("#tbodyId");
+	tBody.empty();
+	if(data.length > 0){
+		//2.迭代data内容将数据追加到tbody中
+		for(var i in data){
+			var tr = $("<tr></tr>");
+			tr.data("rowData", data[i]);
+			var tds = doCreateTds(data[i]);
+			tr.append(tds);
+			tBody.append(tr);
+		}
+	}
+}
+function doCreateTds(data){
+	var type;
+	if(data.quesType === "01"){
+		type = "单选题";
+	}else if(data.quesType === "02"){
+		type = "多选题";
+	}else if(data.quesType === "03"){
+		type = "简答题";
+	}
+	var tds=
+		"<td><input type='checkbox' name='quesId' class='quesId' value='"+data.quesId+"'><span class='numberClass'></span></td>"+
+		"<td>"+data.quesId+"</td>"+
+		"<td><input type='submit' style='width:500px;' value='"+data.quesName+"' onclick='doGetQuesOption("+data.quesId+")'></td>"+
+	    "<td>"+type+"</td>"+
+	    "<td>"+data.createTime+"</td>";
+    return tds;
+}
+//页面数据自增序列号
+function autoAddNumber(){
+    var pageCurrent = $("#pageId").data("pageCurrent");
+    var pageNo = (pageCurrent-1) * 10;
+	function number(){
+	    var index = 0;
+    	for(var i = 0+pageNo;i < $(".numberClass").length+pageNo; i++){
+			$(".numberClass").get(index).innerHTML = i+1;
+			index++;
+    	}
+	}
+	number();
+}
+//单选和复选框操作=======================================================
+//单选操作
+function doChangeTHeadCheckBoxState(){
+	var flag = true;
+	$("#tbodyId input[type='checkbox']").each(function() {
+		flag = flag && $(this).prop("checked");
+	});
+	$("#checkAllId").prop("checked", flag);
+}
+//全选操作
+function doChangeTBodyCheckBoxState(){
+	var state = $(this).prop("checked");
+	$("#tbodyId input[type='checkbox']").prop("checked", state);
+}
+//获取选项删除操作------------------------------------------------------------
+//获取用户选中的记录id
+function doGetCheckedIds(){
+	var array = [];
+	$("#tbodyId input[type='checkbox").each(function(){
+		if($(this).prop("checked")){
+			array.push($(this).val());
+		}
+	});
+	return array;
+}
+//删除操作
+function doDeleteQues() {
+	var ids = doGetCheckedIds();
+	if(ids.length == 0) {
+		alert("请先选择");
+		return;
+	}
+	if(window.confirm("您确定要删除吗？")){
+		var params = {"quesIds" : ids.toString()}
+		var url = "ques/doDeleteQues";
+		$.post(url, params, function(result){
+			doGetObjects();//重新页面加载
+			alert(result.message);
+		});
+	}
+}
+//================================================================
+//添加和修改操作
+//添加操作
+function doLoadEditUI(){
+	var title;
+	if($(this).hasClass("btn-add-single")){
+		title = "添加单选题";
+	}else if($(this).hasClass("btn-add-multiple")){
+		title = "添加多选题";
+	}else if($(this).hasClass("btn-add-easy")){
+		title = "添加简答题";
+	}
+	var url = "ques/doQuesEditUI"
+	doLoadPage(title, url);
+}
+//修改操作
+function doGetQuesOption(quesId){
+	var url = "ques/doGetQuesOption";
+	var params = {"quesId" : quesId}
+	$.getJSON(url, params, function(result){
+		$("#mainContentId").data("rowData", result.data);
+		var title;
+		if(result.data.quesType === "01"){
+			title = "修改单选题";
+		}else if(result.data.quesType === "02"){
+			title = "修改多选题";
+		}else if(result.data.quesType === "03"){
+			title = "修改简答题";
+		}
+		var url = "ques/doQuesEditUI"
+        doLoadPage(title, url);
+	});
+}
+//跳转操作
+function doLoadPage(title, url){
+	$("#mainContentId").load(url, function(){
+		$(".box-title").html(title);
+	}) 
+}
+//导入Execl
+function doImportQues(){
+	if(checkout()){
+		var formData = new FormData($("#form_table")[0]);
+		$.ajax({
+	        url : "ques/doImportQues",//这里写你的url
+	        type : "post",//post请求
+	        dataType : "json",//这里是返回类型，一般是json,text等
+	        cache : false,//上传文件不需要缓存
+	        data : formData,
+	        //告诉jQuery不要去设置Content-Type请求头
+	        contentType : false,//当有文件要上传时,此项是必须的,否则后台无法识别文件流的起始位置
+	        //告诉jQuery不要去处理发送的数据
+	        processData : false,//是否序列化data属性,默认true(注意：false时type必须是post)               
+	        clearForm : true,//提交后是否清空表单数据
+	        async : false,//用于控制同步和异步，默认是true
+	        success : function(result){
+	        	doGetObjects();
+	        	alert(result.message);
+	        }
+	    });
+	}
+}
+//导入前校验
+function checkout(){
+	var file = $("#file_excel").val();
+	if(file == ""){
+		alert("请选择文件！！！");
+		return false;
+	}else{
+		return true;
+	}
+}
+</script>

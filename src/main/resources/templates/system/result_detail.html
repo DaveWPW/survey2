@@ -1,0 +1,91 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="box">
+	  <div class="box-header">
+	  	<div>
+	  		<span style="font-weight:bold">手机号码：</span><span class="mobile"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+	  		<span style="font-weight:bold">问卷名称：</span><span class="paper-name"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+	  		<span style="font-weight:bold">作答时间：</span><span class="paper-date"></span>
+	  	</div>
+	    <div class="box-tools">
+		  <div class="input-group input-group-sm" style="width: 25px;">
+			<div class="input-group-btn">
+			  <button type="button" class="btn btn-default btn-cancel">返回</button>
+			</div>
+		  </div>
+	    </div>
+	  </div>
+	  <!-- /.box-header -->
+	  <div class="box-body table-responsive no-padding">
+	    <table class="table table-hover">
+	      <thead>
+		    <tr>
+			  <th>序号</th>
+			  <th>类型</th>
+			  <th>题目</th>
+			  <th>答案</th>
+		    </tr>
+		  </thead>
+		  <tbody id="tbodyId"></tbody>
+	    </table>
+	  </div>
+	  <!-- /.box-body --> 
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+$(function(){
+	$(".input-group-btn").on("click",".btn-cancel", doCancel);
+	doInitPage();
+});
+function doInitPage(){
+	var data = $("#mainContentId").data("rowData");
+	var tBody = $("#tbodyId");
+	tBody.empty();
+	if(data.length > 0){
+		var a = 1;
+		for(var i in data){
+			//debugger;
+			var quesNum = $("#tbodyId").find("tr").eq(i-a).find("td").eq(0).html();
+			if(quesNum == data[i].quesNum){
+				var optionContent = $("#tbodyId").find("tr").eq(i-a).find("td").eq(3).html();
+				var text = optionContent+", "+data[i].optionContent;
+				$("#tbodyId").find("tr").eq(i-a).find("td").eq(3).html(text);
+				a++;
+			}else{
+				var tr = $("<tr></tr>");
+				tr.data("rowData", data[i]);
+				var tds = doCreateTds(data[i]);
+				tr.append(tds);
+				tBody.append(tr);
+			}
+		}
+	}
+}
+function doCreateTds(data){
+	var type;
+	if(data.quesType === "01"){
+		type = "单选题";
+	}else if(data.quesType === "02"){
+		type = "多选题";
+	}else if(data.quesType === "03"){
+		type = "简答题";
+	}
+	var tds=
+		"<td>"+data.quesNum+"</td>"+
+	    "<td>"+type+"</td>"+
+	    "<td>"+data.quesName+"</td>"+
+	    "<td>"+data.optionContent+"</td>";
+    return tds;
+}
+function doCancel(){
+	$("#mainContentId").removeData("rowData");
+	$("#mainContentId").load("result/doResultListUI");
+}
+//console.log();
+//alert();
+//debugger;
+</script>

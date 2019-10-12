@@ -1,0 +1,215 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="box">
+	  <div class="box-header">
+	    <h3 class="box-title">调查结果管理</h3>
+	    <div class="box-button" style="float:right;">
+			<label>开始日期：</label>
+			<input type="date" name="table_search" id="startDate">
+			<label>结束日期：</label>
+			<input type="date" name="table_search" id="endDate">
+			<label>问卷名称：</label>
+			<input type="text" name="table_search" id="searchNameId" placeholder="请输入问卷名称">
+			<button type="button" class="btn-search">
+	          <i class="fa fa-search"></i>
+			</button>
+			<button type="button" class="btn-export">导出</button>
+			<button type="button" class="btn-delete">删除</button>
+	    </div>
+	  </div>
+	  <!-- /.box-header -->
+	  <div class="box-body table-responsive no-padding">
+	    <table class="table table-hover text-center">
+	      <thead>
+		    <tr>
+		      <th><input type="checkbox" id="checkAllId">全选</th>
+			  <th>用户手机号</th>
+			  <th>CLI</th>
+			  <th>Agent ID</th>
+			  <th>问卷名称</th>
+			  <th>问卷语言</th>
+			  <th>问卷类型</th>
+			  <th>作答时间</th>
+		    </tr>
+		  </thead>
+		  <tbody id="tbodyId"></tbody>
+	    </table>
+	  </div>
+	  <!-- /.box-body --> 
+	  <div id="pageId" class="box-footer clearfix"></div>
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+$(function(){
+	//加载分页组件
+	$("#pageId").load("doPageUI", function(){
+		//加载页面数据
+		doGetObjects();
+	});
+	$("#checkAllId").change(doChangeTBodyCheckBoxState);
+	$("#tbodyId")
+		.on("change", ".resultId", doChangeTHeadCheckBoxState)
+		.on("click", ".btn-open", doOpenDetails);
+	$(".box-button")
+		.on("click",".btn-search", doQueryObjects)
+		.on("click",".btn-export", doExportResult)
+		.on("click",".btn-delete", doDeleteQues);
+});
+//页面显示数据操作================================================================
+//处理查询按钮事件
+function doQueryObjects(){
+	$("#pageId").data("pageCurrent", 1);
+	doGetObjects();
+}
+//页面加载完成异步加载当前页数据
+function doGetObjects(){
+	var url = "result/doFindResultList";
+	var pageCurrent = $("#pageId").data("pageCurrent");
+	if(!pageCurrent)pageCurrent = 1;
+	var params = {"pageCurrent" : pageCurrent}
+	params.paperName = $("#searchNameId").val().trim();
+	params.startDate = $("#startDate").val();
+	params.endDate = $("#endDate").val();
+	$.getJSON(url, params, function(result){
+		doHandleResponseResult(result);
+	});
+}
+function doHandleResponseResult(result){
+	if(result.state == 1){
+		doSetTableBodyRows(result.data.records);
+		doSetPagination(result.data);
+		autoAddNumber();//自增序列号
+        doChangeTHeadCheckBoxState();//重置复选框
+	}else{
+		alert(result.message);
+	}
+}
+//通过服务端返回的数据初始化页面
+function doSetTableBodyRows(data){
+	//1.获取tbody对象，并清空内容
+	var tBody = $("#tbodyId");
+	tBody.empty();
+	if(data.length > 0){
+		//2.迭代data内容将数据追加到tbody中
+		for(var i in data){
+			var tr = $("<tr></tr>");
+			tr.data("rowData", data[i]);
+			var tds = doCreateTds(data[i]);
+			tr.append(tds);
+			tBody.append(tr);
+		}
+	}
+}
+function doCreateTds(data){
+	var type;
+	if(data.paperType === "01"){
+		type = "单张";
+	}else if(data.paperType === "02"){
+		type = "分支";
+	}
+	var language;
+	if(data.paperLanguage === "ch"){
+		language = "中文";
+	}else if(data.paperLanguage === "eng"){
+		language = "英文";
+	}
+	var tds=
+		"<td><input type='checkbox' name='resultId' class='resultId' value='"+data.resultId+"'><span class='numberClass'></span></td>"+
+	    "<td><input type='button' value='"+data.mobileNum+"' class='btn-open'></td>"+
+	    "<td>"+data.cli+"</td>"+
+	    "<td>"+data.agentId+"</td>"+
+	    "<td>"+data.paperName+"</td>"+
+	    "<td>"+language+"</td>"+
+	    "<td>"+type+"</td>"+
+	    "<td>"+data.createTime+"</td>";
+    return tds;
+}
+//页面数据自增序列号
+function autoAddNumber(){
+    var pageCurrent = $("#pageId").data("pageCurrent");
+    var pageNo = (pageCurrent-1) * 10;
+	function number(){
+	    var index = 0;
+    	for(var i = 0+pageNo;i < $(".numberClass").length+pageNo; i++){
+			$(".numberClass").get(index).innerHTML = i+1;
+			index++;
+    	}
+	}
+	number();
+}
+//单选和复选框操作=======================================================
+//单选操作
+function doChangeTHeadCheckBoxState(){
+	var flag = true;
+	$("#tbodyId input[type='checkbox']").each(function() {
+		flag = flag && $(this).prop("checked");
+	});
+	$("#checkAllId").prop("checked", flag);
+}
+//全选操作
+function doChangeTBodyCheckBoxState(){
+	var state = $(this).prop("checked");
+	$("#tbodyId input[type='checkbox']").prop("checked", state);
+}
+//获取选项删除操作------------------------------------------------------------
+//获取用户选中的记录id
+function doGetCheckedIds(){
+	var array = [];
+	$("#tbodyId input[type='checkbox").each(function(){
+		if($(this).prop("checked")){
+			array.push($(this).val());
+		}
+	});
+	return array;
+}
+//删除操作
+function doDeleteQues() {
+	var ids = doGetCheckedIds();
+	if(ids.length == 0) {
+		alert("请先选择");
+		return;
+	}
+	if(window.confirm("您确定要删除吗？")){
+		var params = {"resultIds" : ids.toString()}
+		var url = "result/doDeleteResult";
+		$.post(url, params, function(result){
+			if(result.state == 1){
+				doGetObjects();//重新页面加载
+				alert(result.message);
+			}else{
+				alert(result.message);
+			}
+		});
+	}
+}
+function doOpenDetails(){
+	var resultId = $(this).parents("tr").find("td").eq(0).find("input").val();
+	var paperName = $(this).parents("tr").find("td").eq(4).html();
+	var paperDate = $(this).parents("tr").find("td").eq(7).html();
+	var mobile = $(this).val();
+	var url = "result/doGetResultQues";
+	var params = {"resultId" : resultId}
+	$.getJSON(url, params, function(result){
+		$("#mainContentId").data("rowData", result.data);
+		var url = "result/doResultDetailUI";
+		$("#mainContentId").load(url, function(){
+			$(".mobile").html(mobile);
+			$(".paper-name").html(paperName);
+			$(".paper-date").html(paperDate);
+		})
+	});
+}
+function doExportResult(){
+	var paperName = $("#searchNameId").val().trim();
+	var startDate = $("#startDate").val();
+	var endDate = $("#endDate").val();
+    window.location.href="result/doExportResult?paperName="+paperName+"&startDate="+startDate+"&endDate="+endDate;
+}    
+//console.log();
+//alert();
+//debugger;
+</script>

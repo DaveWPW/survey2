@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <title>Survey</title>
+</head>
+<style>
+.body-backgauge{
+	margin-left:5%;
+	margin-right:5%;
+	margin-top:3%;
+}
+</style>
+<body class="body-backgauge">
+  <input id="paperLanguage" type="hidden" th:value="${language}"/>
+  <input id="paperName" type="hidden" th:value="${paperName}"/>
+  <input id="mobile" type="hidden" th:value="${mobile}"/>
+  <input id="cli" type="hidden" th:value="${cli}"/>
+  <input id="agentId" type="hidden" th:value="${agentId}"/>
+  <input id="inviteTime" type="hidden" th:value="${inviteTime}"/>
+  <div>
+  	<img alt="3logo" src="images/3logo_28-5-18.gif">
+  </div>
+  <div id="paperDiv"></div>
+  <div id="thanks" style="font-size:18px;"></div>
+  <div class="box-button" align="center" style="margin-top: 30px; margin-bottom: 90px;">
+    <button type="button" class="btn-submit" style="background-color: grey; width: 100px; height: 30px; color: #fff;"></button>
+  </div>
+  <div class="box-footer" style="background:#FFFFFF; position:fixed; bottom:0px; width:90%;">
+    <div style="float:left; width:40%; margin-top:2%">
+  	  <span>© 3HK |</span>
+  	  <a href="#" class="terms-url"><span id="text1"></span></a>
+    </div>
+    <div style="float:right; width:55%; margin-bottom:2%; margin-top:2%">
+  	  <img alt="signature" src="images/signature.png">
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	doGetObjects();
+	doButtonChange();
+	$(".box-button").on("click",".btn-submit", doSubmit);
+	$("#paperDiv")
+		.on("change", ".esayResult", checkLength)
+		.on("change", ".flag", checkOptionLength);
+	$(".box-footer").on("click",".terms-url", doTermsUrl);
+});
+//触发性校验填空题内容长度操作
+function checkLength(){
+	var text = $(this).val();
+	if($("#paperLanguage").val() === "ch"){
+		if(text.length > 40){
+			alert("仅限40个中文字符！");
+		}
+	}else if($("#paperLanguage").val() === "eng"){
+		if(text.length > 80){
+			alert("Limit 80 English characters！");
+		}
+	}
+}
+//触发性校验选项可填空内容长度操作
+function checkOptionLength(){
+	var text = $(this).val();
+	if($("#paperLanguage").val() === "ch"){
+		if(text.length > 10){
+			alert("仅限10个中文字符！");
+		}
+	}else if($("#paperLanguage").val() === "eng"){
+		if(text.length > 20){
+			alert("Limit 20 English characters！");
+		}
+	}
+}
+//页面加载获取调查问卷数据操作
+function doGetObjects(){
+	var url = "survey/doStartSurvey";
+	var params = {
+			"paperLanguage" : $("#paperLanguage").val(),
+			"paperName" : $("#paperName").val(),
+			}
+	$.post(url, params, function(result){
+		if(result.state == 1){
+			doInitPaperDate(result.data);
+			var params = {"quesIds" : result.data.quesIds.toString()}
+			var url = "paper/doSelectQues";
+			$.post(url, params, function(result){
+				doInitQuesDate(result.data);
+			});
+		}else{
+			alert(result.message);
+		}
+	});
+}
+//初始化调查问卷基本内容Div操作
+function doInitPaperDate(data){
+	var paperDiv = $("#paperDiv");
+	var paper =
+		"<input id='paperId' style='display: none;' value='"+data.paperId+"'>"+
+		"<input id='paperType' style='display: none;' value='"+data.paperType+"'>"+
+		"<div id='paperTitle'><h1>"+data.paperTitle+"</h1></div>"+
+		"<div id='greet'><h4>"+data.greet+"</h4></div>"+
+		"<div id='quesDivs'></div>"+
+		"<input id='thank' style='display: none;' value='"+data.thank+"'>"+
+		"<input id='termsUrl' style='display: none;' value='"+data.termsUrl+"'>";
+	paperDiv.append(paper);
+}
+//初始化调查问题操作
+function doInitQuesDate(data){
+	for(var a in data){
+		var quesInfo = data[a];
+		doAddQuesName(quesInfo.quesId, quesInfo.quesType, quesInfo.must);
+		$(".quesName").eq(a).html(quesInfo.quesName);
+		var quesDiv = $(".quesDiv").eq(a);
+		for(var i = 0; i < quesInfo.options.length; i++){
+			doAddOption(quesInfo.options[i], quesInfo.optionIds[i], quesInfo.quesType, quesDiv, quesInfo.quesId, quesInfo.flags[i]);
+		}
+		if(quesInfo.quesType === "03"){
+			doAddEsay(quesDiv);
+		}
+		if(quesInfo.must == 0){
+			$(".is-must").eq(a).hide();//隐藏必作答标识
+		}
+	}
+	autoAddNumber();
+	$(".flag").each(function(){
+		if($(this).val() == 1){
+			$(this).show();//显示
+			$(this).val("");
+		}
+	});
+}
+//添加题目Div操作
+function doAddQuesName(quesId, quesType, must){
+	var quesDivs = $("#quesDivs");
+	var quesNameDiv =
+		"<br/>"+
+		"<div class='quesDiv' style='font-size:18px;'>"+
+			"<div class='ques'>"+
+    			"<div>"+
+    				"<label>"+
+	    				"<label class='numberClass'></label><label>.</label>"+
+	    				"<span style='color:red;' class='is-must'>*</span>"+
+	    				"<input class='quesId' value='"+quesId+"' style='display:none;'/>"+
+	    				"<input class='quesType' value='"+quesType+"' style='display:none;'/>"+
+	    				"<input class='must' value='"+must+"' style='display:none;'/>"+
+	    				"<span class='quesName'></span>"+
+    				"</label>"+
+    			"</div>"+
+    		"</div>"+
+    	"</div>";
+    quesDivs.append(quesNameDiv);
+}
+//添加单选题和多选题Div操作
+function doAddOption(optionCon, optionId, type, quesDiv, quesId, flag){
+	var image = "";
+	if(optionCon.indexOf("@#") != -1){
+		arr = optionCon.split("@#");
+		optionCon = arr[1];
+		image = "<img alt='"+arr[0]+"' src='images/"+arr[0]+".png'>";
+	}
+	var content;
+	if($("#paperLanguage").val() === "ch"){
+		content = "僅限10箇中文字符！";
+	}else if($("#paperLanguage").val() === "eng"){
+		content = "Limit 20 English characters！";
+	}
+	if(type === "01"){
+		var optionDiv = 
+			"<div class='option'>"+
+				"<div>"+
+					"<label>"+ 
+						"<input type='radio' class='optionId' name='optionName"+quesId+"' value='"+optionId+"'>"+image+"<span class='optionContent' style='color: #191970;'>"+optionCon+"</span>"+
+						"<input type='text' class='flag' value='"+flag+"' style='display:none;' placeholder='"+content+"'>"+
+					"</label>"+ 
+				"</div>"+
+			"</div>";
+		quesDiv.append(optionDiv);
+	}else if(type === "02"){
+		var optionDiv = 
+			"<div class='option'>"+
+				"<div>"+
+					"<label>"+
+						"<input type='checkbox' class='optionId' value='"+optionId+"'><span class='optionContent' style='color: #191970;'>"+optionCon+"</span>"+
+						"<input type='text' class='flag' value='"+flag+"' style='display:none;' placeholder='"+content+"'>"+
+					"</label>"+
+				"</div>"+
+			"</div>";
+		quesDiv.append(optionDiv);
+	}
+}
+//添加简答题Div操作
+function doAddEsay(quesDiv){
+	var content;
+	if($("#paperLanguage").val() === "ch"){
+		content = "僅限40箇中文字符！";
+	}else if($("#paperLanguage").val() === "eng"){
+		content = "Limit 80 English characters！";
+	}
+	var optionDiv = 
+		"<div class='option'>"+
+			"<div>"+
+				"<textarea class='esayResult' rows='3' cols='41' placeholder='"+content+"'></textarea>"+
+			"</div>"+
+		"</div>";
+	quesDiv.append(optionDiv);
+}
+//自增序列号
+function autoAddNumber(){
+	function number(){
+	    var index = 0;
+    	for(var i = 0;i < $(".numberClass").length; i++){
+			$(".numberClass").get(index).innerHTML = i+1;
+			index++;
+    	}
+	}
+	number();
+}
+//定义提交按钮语言
+function doButtonChange(){
+	if($("#paperLanguage").val() === "ch"){
+		$(".btn-submit").html("提交");
+		$("#text1").html("條款及細則");//页尾a标签提示
+	}else if($("#paperLanguage").val() === "eng"){
+		$(".btn-submit").html("Submit");
+		$("#text1").html("Terms & Conditions");
+	}
+}
+//提交操作
+function doSubmit(){
+	var params = getSubmitData();
+	if(params){
+		var url = "survey/doSubmitSurveyResult";
+		$.post(url, params, function(result){
+			if(result.state == 1){
+				var thank = $("#thank").val();
+				$("#paperDiv").remove();
+				var div = "<div><h4>"+thank+"</h4></div>";
+				$("#thanks").append(div);
+				$(".box-button").hide();
+			}else{
+				alert(result.message);
+			}
+		})
+	}
+}
+//获取数据和校验操作
+function getSubmitData(){
+	var params;
+	var valid = true;
+	var quesNums = [];
+	var quesIds = [];
+	var quesNames = [];
+	var quesTypes = [];
+	var optionCons = [];
+	$(".quesDiv").each(function(){
+		if(valid){
+			var num = $(this).find(".ques").eq(0).find("div").eq(0).find(".numberClass").eq(0).html();
+			var quesId = $(this).find(".ques").eq(0).find("div").eq(0).find("input").eq(0).val();
+			var quesName = $(this).find(".ques").eq(0).find("div").eq(0).find(".quesName").html().trim();
+			var quesType = $(this).find(".ques").eq(0).find("div").eq(0).find("input").eq(1).val();
+			var must = $(this).find(".ques").eq(0).find("div").eq(0).find("input").eq(2).val();
+			if(quesType === "01"){
+				var optionId = $("div input[name='optionName"+quesId+"']:checked").val();
+				if((optionId == null || optionId == "") && must == 1){
+					valid = false;
+					return;
+				}
+				var optionCon = $("div input[name='optionName"+quesId+"']:checked").parent().find(".optionContent").html();
+				var flag = $("div input[name='optionName"+quesId+"']:checked").parent().find(".flag").val();
+				if(checkFlag(flag)){
+					valid = false;
+					return;
+				}
+				if(flag != 0){
+					optionCon = optionCon + flag;
+				}
+				quesNums.push(num);
+				quesIds.push(quesId);
+				quesNames.push(quesName);
+				quesTypes.push(quesType);
+				optionCons.push(optionCon);
+			}else if(quesType === "02"){
+				if(($("div input[type='checkbox']:checked").length == 0)  && must == 1){
+					valid = false;
+					return;
+				}
+				$("div input[type='checkbox']").each(function(){
+					if($(this).prop("checked")){
+						var optionCon = $(this).parent().find(".optionContent").html();
+						var flag = $(this).parent().find(".flag").val();
+						if(checkFlag(flag)){
+							valid = false;
+							return;
+						}
+						if(flag != 0){
+							optionCon = optionCon + flag;
+						}
+						quesNums.push(num);
+						quesIds.push(quesId);
+						quesNames.push(quesName);
+						quesTypes.push(quesType);
+						optionCons.push(optionCon);
+					}
+				});
+			}else if(quesType === "03"){
+				var esayCon = $(this).find(".esayResult").val();
+				if((esayCon == null || esayCon == "") && must == 1){
+					valid = false;
+					return;
+				}
+				if($("#paperLanguage").val() === "ch"){
+					if(esayCon.length > 40){
+						valid = false;
+						return;
+					}
+				}else if($("#paperLanguage").val() === "eng"){
+					if(esayCon.length > 80){
+						valid = false;
+						return;
+					}
+				}
+				quesNums.push(num);
+				quesIds.push(quesId);
+				quesNames.push(quesName);
+				quesTypes.push(quesType);
+				optionCons.push(esayCon);
+			}
+		}
+	});
+	if(valid){
+		params = {
+			"mobileNum" : $("#mobile").val(),
+			"cli" : $("#cli").val(),
+			"agentId" : $("#agentId").val(),
+			"paperId" : $("#paperId").val(),
+			"paperName" : $("#paperName").val(),
+			"paperType" : $("#paperType").val(),
+			"paperLanguage" : $("#paperLanguage").val(),
+			"inviteTime" : $("#inviteTime").val(),
+			"quesNums" : quesNums.toString(),
+			"quesIds" : quesIds.toString(),
+			"quesNames" : quesNames.toString(),
+			"quesTypes" : quesTypes.toString(),
+			"optionCons" : optionCons.toString(),
+		}
+	}else{
+		alert("请完成作答！");
+	}
+	return params;
+}
+//校验选项可填空内容操作
+function checkFlag(flag){
+	if(flag == null || flag == ""){
+		return true;
+	}
+	if($("#paperLanguage").val() === "ch"){
+		if(flag.length > 10){
+			return true;
+		}
+	}else if($("#paperLanguage").val() === "eng"){
+		if(flag.length > 20){
+			return true;
+		}
+	}
+	return false;
+}
+function doTermsUrl(){
+	if($("#paperLanguage").val() === "ch"){
+		$("#termsUrl").val("https://www.three.com.hk/website/appmanager/three/home?_nfpb=true&pageid=zz6101&_pageLabel=P200470391219567710594&lang=chi");
+	}else if($("#paperLanguage").val() === "eng"){
+		$("#termsUrl").val("https://www.three.com.hk/website/appmanager/three/home?_nfpb=true&pageid=zz6101&_pageLabel=P200470391219567710594&lang=eng");
+	}
+	var url = $("#termsUrl").val();
+	window.open(url, "_blank", "scrollbars=1, resizable=1, height=600, width=1100");
+}
+//console.log();
+//alert();
+//debugger;
+</script>
+</html>

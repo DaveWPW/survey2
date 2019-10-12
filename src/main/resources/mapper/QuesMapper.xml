@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dave.dao.QuesDao">
+	<select id="findQuesList" resultType="com.dave.entity.Ques">
+		select * from su_ques where status = 1
+		<if test="quesName != null and '' != quesName">
+			and ques_name like concat(concat('%', #{quesName}), '%')
+		</if>
+		order by create_time desc, ques_id asc
+		limit #{startIndex}, #{pageSize}
+	</select>
+	<insert id="addQues" parameterType="com.dave.entity.Ques"  useGeneratedKeys="true" keyProperty="quesId">
+     	insert into su_ques
+      	(ques_name, ques_type, must, create_time, status)
+      	values
+		(#{quesName}, #{quesType}, #{must}, #{createTime}, #{status})
+	</insert>
+	<update id="updateQues" parameterType="com.dave.entity.Ques">
+		update su_ques set ques_name = #{quesName}, must = #{must}, modify_time = now() where ques_id = #{quesId}
+	</update>
+	<update id="deleteQues">
+		update su_ques set status = 0, modify_time = now()
+		where ques_id = #{quesId} and 0 = (
+		select count(*) from su_paper_ques pq
+		left join su_paper p on pq.paper_id = p.paper_id
+		where p.status != 0 and pq.ques_id = #{quesId})
+	</update>
+	<select id="findUsePaperNameByQuesIds" resultType="String">
+		select distinct p.paper_name
+		from su_paper_ques pq left join su_paper p on pq.paper_id = p.paper_id
+		where p.status != 0 and pq.ques_id in
+		<foreach collection="quesIds" open="(" close=")" separator="," item="quesId">
+			#{quesId}
+		</foreach>
+	</select>
+	<select id="findUseQuesIdByQuesIds" resultType="String">
+		select ques_id from su_ques where status = 1 and ques_id in
+		<foreach collection="quesIds" open="(" close=")" separator="," item="quesId">
+			#{quesId}
+		</foreach>
+	</select>
+</mapper>

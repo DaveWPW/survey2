@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <title>Survey System | 主页</title>
+  <!-- Tell the browser to be responsive to screen width -->
+  <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css">
+  <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
+  <link rel="stylesheet" href="dist/css/skins/skin-blue.min.css">
+  <link rel="stylesheet" href="bower_components/layer/skin/default/layer.css">
+  <link rel="stylesheet" href="bower_components/ztree/css/metroStyle/metroStyle.css"/>
+  <link rel="stylesheet" href="bower_components/treegrid/jquery.treegrid.css"/>
+</head>
+<body class="hold-transition skin-blue sidebar-mini">
+<div class="wrapper">
+  <!-- Main Header -->
+  <header class="main-header">
+    <h3 style="color:white; margin:10px 0px 15px 5px;">Survey Syetem</h3>
+  </header>
+  <!-- Left side column. contains the logo and sidebar -->
+  <aside class="main-sidebar">
+    <!-- sidebar: style can be found in sidebar.less -->
+    <section class="sidebar">
+      <!-- Sidebar Menu -->
+      <ul class="sidebar-menu" data-widget="tree">
+        <li class="treeview">
+          <a href="#"><i class="fa fa-link"></i><span>系统管理</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+            </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a id="load-ques-id">调查问题管理</a></li>
+            <li><a id="load-paper-id">调查问卷管理</a></li>
+            <li><a id="load-result-id">调查结果管理</a></li>
+          </ul>
+        </li>
+      </ul>
+      <!-- /.sidebar-menu -->
+    </section>
+    <!-- /.sidebar -->
+  </aside>
+
+  <!-- Content Wrapper. Contains page content -->
+  <div class="content-wrapper">
+    <!-- Main content -->
+    <section id="mainContentId" class="content container-fluid">
+    </section>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+</div>
+</body>
+<!-- jQuery 3 -->
+<script src="bower_components/jquery/dist/jquery.min.js"></script>
+<!-- Bootstrap 3.3.7 -->
+<script src="bower_components/bootstrap/dist/js/bootstrap.min.js"></script>
+<!-- AdminLTE App -->
+<script src="dist/js/adminlte.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	doLoadUI("load-ques-id", "ques/doQuesListUI");
+	doLoadUI("load-paper-id", "paper/doPaperListUI");
+	doLoadUI("load-result-id", "result/doResultListUI");
+})
+function doLoadUI(id, url){
+	$("#"+id).click(function(){
+    	$("#mainContentId").load(url, function(){
+        	$("#mainContentId").removeData();
+        });
+    });
+}
+</script>
+</body>
+</html>

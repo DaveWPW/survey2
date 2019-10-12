@@ -1,0 +1,301 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="box">
+	  <div class="box-header">
+	    <h3 class="box-title">调查问卷管理</h3>
+	    <div class="box-tools">
+		  <div class="input-group input-group-sm" style="width: 500px;">
+		    <input type="text" name="table_search" id="searchNameId"
+				  class="form-control pull-right" placeholder="请输入问卷名称">
+			<div class="input-group-btn">
+			  <button type="button" class="btn btn-default btn-search">
+                <i class="fa fa-search"></i>
+			  </button>
+			  <button type="button" class="btn btn-default btn-create-only">创建单张问卷</button>
+			  <button type="button" class="btn btn-default btn-create-branch">创建分支问卷</button>
+			  <button type="button" class="btn btn-default btn-delete">删除</button>
+			</div>
+		  </div>
+	    </div>
+	  </div>
+	  <!-- /.box-header -->
+	  <div class="box-body table-responsive no-padding">
+	    <table class="table table-hover text-center">
+	      <thead>
+		    <tr>
+		      <th><input type="checkbox" id="checkAllId">全选</th>
+			  <th>问卷名称</th>
+			  <th>问卷类型</th>
+			  <th>问卷语言</th>
+			  <th>当前状态/可操作</th>
+			  <th>创建日期</th>
+			  <th>测试</th>
+		    </tr>
+		  </thead>
+		  <tbody id="tbodyId"></tbody>
+	    </table>
+	  </div>
+	  <!-- /.box-body -->
+	  <div id="pageId" class="box-footer clearfix"></div>
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+$(function(){
+	//加载分页组件
+	$("#pageId").load("doPageUI", function(){
+		//加载页面数据
+		doGetObjects();
+	});
+	$("#checkAllId").change(doChangeTBodyCheckBoxState);
+	$("#tbodyId").on("change", ".quesId", doChangeTHeadCheckBoxState);
+	$(".input-group-btn")
+		.on("click",".btn-search", doQueryObjects)
+		.on("click",".btn-create-branch", doLoadEditUI)
+		.on("click",".btn-create-only", doLoadEditUI)
+		.on("click",".btn-delete", doDeletePaper);
+	$("#tbodyId")
+		.on("click", ".btn-status", doUpdateStatus)
+		.on("click", ".btn-test", doTestPaper);
+});
+//页面显示数据操作================================================================
+//处理查询按钮事件
+function doQueryObjects(){
+	$("#pageId").data("pageCurrent", 1);
+	doGetObjects();
+}
+//页面加载完成异步加载当前页数据
+function doGetObjects(){
+	var url = "paper/doFindPaperList";
+	var pageCurrent = $("#pageId").data("pageCurrent");
+	if(!pageCurrent)pageCurrent = 1;
+	var params = {"pageCurrent" : pageCurrent}
+	params.paperName = $("#searchNameId").val().trim();
+	$.getJSON(url, params, function(result){
+		doHandleResponseResult(result);
+	});
+}
+function doHandleResponseResult(result){
+	if(result.state == 1){
+		doSetTableBodyRows(result.data.records);
+		doSetPagination(result.data);
+		autoAddNumber();//自增序列号
+        doChangeTHeadCheckBoxState();//重置复选框
+	}else{
+		alert(result.message);
+	}
+}
+//通过服务端返回的数据初始化页面
+function doSetTableBodyRows(data){
+	//1.获取tbody对象，并清空内容
+	var tBody = $("#tbodyId");
+	tBody.empty();
+	if(data.length > 0){
+		//2.迭代data内容将数据追加到tbody中
+		for(var i in data){
+			var tr = $("<tr></tr>");
+			tr.data("rowData", data[i]);
+			var tds = doCreateTds(data[i]);
+			tr.append(tds);
+			tBody.append(tr);
+		}
+	}
+}
+function doCreateTds(data){
+	var type;
+	if(data.paperType === "01"){
+		type = "单张";
+	}else if(data.paperType === "02"){
+		type = "分支";
+	}
+	var showStatus;
+	var status;
+	if(data.status === 9){
+		showStatus = "禁用";
+		status = "使用";
+	}else if(data.status === 1){
+		showStatus = "使用";
+		status = "禁用";
+	}
+	var language;
+	if(data.paperLanguage === "eng"){
+		language = "英文";
+	}else if(data.paperLanguage === "ch"){
+		language = "中文";
+	}
+	var tds=
+		"<td><input type='checkbox' name='paperId' class='paperId' value='"+data.paperId+"'><span class='numberClass'></span></td>"+
+	    "<td><input type='button' style='width:300px;' value='"+data.paperName+"' onclick='doGetPaperQues("+data.paperId+")'></td>"+
+	    "<td>"+type+"</td>"+
+	    "<td>"+language+"</td>"+
+	    "<td>"+showStatus+"：<input type='button' value='"+status+"' class='btn-status'></td>"+
+	    "<td>"+data.createTime+"</td>"+
+	    "<td><input type='button' class='btn-test' value='测试'></td>";
+    return tds;
+}
+//页面数据自增序列号
+function autoAddNumber(){
+    var pageCurrent = $("#pageId").data("pageCurrent");
+    var pageNo = (pageCurrent-1) * 10;
+	function number(){
+	    var index = 0;
+    	for(var i = 0+pageNo;i < $(".numberClass").length+pageNo; i++){
+			$(".numberClass").get(index).innerHTML = i+1;
+			index++;
+    	}
+	}
+	number();
+}
+//单选和复选框操作=======================================================
+//单选操作
+function doChangeTHeadCheckBoxState(){
+	var flag = true;
+	$("#tbodyId input[type='checkbox']").each(function() {
+		flag = flag && $(this).prop("checked");
+	});
+	$("#checkAllId").prop("checked", flag);
+}
+//全选操作
+function doChangeTBodyCheckBoxState(){
+	var state = $(this).prop("checked");
+	$("#tbodyId input[type='checkbox']").prop("checked", state);
+}
+//获取去选项删除操作------------------------------------------------------------
+//获取用户选中的记录id
+function doGetCheckedIds(){
+	var array = [];
+	$("#tbodyId input[type='checkbox").each(function(){
+		if($(this).prop("checked")){
+			array.push($(this).val());
+		}
+	});
+	return array;
+}
+//删除操作
+function doDeletePaper() {
+	var ids = doGetCheckedIds();
+	if(ids.length == 0) {
+		alert("请先选择");
+		return;
+	}
+	if(window.confirm("您确定要删除吗？")){
+		var params = {"paperIds" : ids.toString()}
+		var url = "paper/doDeletePaper";
+		$.post(url, params, function(result){
+			if(result.state == 1){
+				doGetObjects();//重新页面加载
+				alert(result.message);
+			}else{
+				alert(result.message);
+			}
+		});
+	}
+}
+//================================================================
+//添加和修改操作
+//添加操作
+function doLoadEditUI(){
+	//debugger;
+	var title;
+	var url;
+	if($(this).hasClass("btn-create-only")){
+		title = "创建单张问卷";
+	}else if($(this).hasClass("btn-create-branch")){
+		title = "创建分支问卷";
+	}
+	url = "paper/doPaperEditUI"
+	doLoadPage(title, url);
+}
+//修改操作
+function doGetPaperQues(paperId){
+	var url = "paper/doGetPaperQues";
+	var params = {"paperId" : paperId}
+	$.getJSON(url, params, function(result){
+		$("#mainContentId").data("paperData", result.data);
+		var url;
+		if(result.data.paperType === "01"){
+			title = "修改单张问卷";
+		}else if(result.data.paperType === "02"){
+			title = "修改分支问卷";
+		}
+		url = "paper/doPaperEditUI"
+        doLoadPage(title, url);
+	});
+}
+//跳转操作
+function doLoadPage(title, url){
+	$("#mainContentId").load(url, function(){
+		$(".box-title").html(title);
+	}) 
+}
+//问卷状态更新操作
+function doUpdateStatus(){
+	var paperId = $(this).parents('tr').find("td").eq(0).find("input").val();
+	var type = $(this).parents('tr').find("td").eq(2).text();
+	var language = $(this).parents('tr').find("td").eq(3).text();
+	var status = $(this).val();
+	var paperType;
+	if(type === "单张"){
+		paperType = "01";
+	}else if(type === "分支"){
+		paperType = "02";
+	}
+	var paperLanguage;
+	if(language === "英文"){
+		paperLanguage = "eng";
+	}else if(language === "中文"){
+		paperLanguage = "ch";
+	}
+	var paperStatus;
+	if(status === "禁用"){
+		paperStatus = 9;
+	}else if(status === "使用"){
+		paperStatus = 1;
+	}
+	var params = {
+			"paperId" : paperId,
+			"paperType" : paperType,
+			"paperLanguage" : paperLanguage,
+			"status" : paperStatus,
+			}
+	var url = "paper/doUpdateStatus";
+	$.post(url, params, function(result){
+		if(result.state == 1){
+			doGetObjects();//重新页面加载
+			alert(result.message);
+		}else{
+			alert(result.message);
+		}
+	});
+}
+function doTestPaper(){
+	var date = new Date();
+	var dateStr,year,month,day,hours,minute,second;
+	year = date.getYear() + 1900;
+	month = date.getMonth() + 1;
+	day = date.getDate();
+	hours = date.getHours() < 10 ? "0" + date.getHours() : date.getHours();
+	minute = date.getMinutes() < 10 ? "0" + date.getMinutes() : date.getMinutes();
+	second = date.getSeconds() < 10 ? "0" + date.getSeconds() : date.getSeconds();
+	dateStr = year.toString() + (month>9?month:'0'+month) + (day>9?day:'0'+day) + hours + minute + second;
+	
+	var language = $(this).parents("tr").find("td").eq(3).html();
+	var paperName = $(this).parents("tr").find("td").eq(1).find("input").eq(0).val();
+	var paperLanguage;
+	if(language === "英文"){
+		paperLanguage = "eng";
+	}else if(language === "中文"){
+		paperLanguage = "ch";
+	}
+	var mobile = Math.floor(Math.random()*100000000);
+	var cli = Math.floor(Math.random()*1000);
+	var url = "doSurveyUI?mobile=852"+mobile+"&language="+paperLanguage+"&cli=66666666"+cli+"&agentId=9999&inviteTime="+dateStr+"&paperName="+paperName;
+	window.open(url, "_blank", "top=100,left=100,width=393,height=660"); 
+}
+//console.log();
+//alert();
+//debugger;
+</script>
