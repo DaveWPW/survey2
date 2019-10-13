@@ -10,8 +10,8 @@ spring:
     #配置mysql数据库
     #mysql新版驱动
     driver-class-name: com.mysql.cj.jdbc.Driver
-    #url: jdbc:mysql://localhost:3306/survey?serverTimezone=CTT
-    url: jdbc:mysql://192.168.3.129:3306/survey?serverTimezone=CTT
+    url: jdbc:mysql://localhost:3306/survey?serverTimezone=CTT
+#    url: jdbc:mysql://192.168.3.129:3306/survey?serverTimezone=CTT
     username: root
     password: root
     #druid连接池配置

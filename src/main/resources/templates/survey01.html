@@ -25,7 +25,7 @@
   </div>
   <div id="paperDiv"></div>
   <div id="thanks" style="font-size:18px;"></div>
-  <div class="box-button" align="center" style="margin-top: 30px; margin-bottom: 90px;">
+  <div class="box-button" align="center" style="margin-top:30px; margin-bottom:90px;">
     <button type="button" class="btn-submit" style="background-color: grey; width: 100px; height: 30px; color: #fff;"></button>
   </div>
   <div class="box-footer" style="background:#FFFFFF; position:fixed; bottom:0px; width:90%;">
@@ -33,8 +33,10 @@
   	  <span>© 3HK |</span>
   	  <a href="#" class="terms-url"><span id="text1"></span></a>
     </div>
-    <div style="float:right; width:55%; margin-bottom:2%; margin-top:2%">
-  	  <img alt="signature" src="images/signature.png">
+    <div style="float:right; width:60%; margin-bottom:2%; margin-top:2%">
+  	  <div style="float:right;">
+  	    <img alt="signature" src="images/signature.png">
+      </div>
     </div>
   </div>
 </body>
@@ -260,7 +262,7 @@ function getSubmitData(){
 		if(valid){
 			var num = $(this).find(".ques").eq(0).find("div").eq(0).find(".numberClass").eq(0).html();
 			var quesId = $(this).find(".ques").eq(0).find("div").eq(0).find("input").eq(0).val();
-			var quesName = $(this).find(".ques").eq(0).find("div").eq(0).find(".quesName").html().trim();
+			var quesName = $(this).find(".ques").eq(0).find("div").eq(0).find(".quesName").html();
 			var quesType = $(this).find(".ques").eq(0).find("div").eq(0).find("input").eq(1).val();
 			var must = $(this).find(".ques").eq(0).find("div").eq(0).find("input").eq(2).val();
 			if(quesType === "01"){
