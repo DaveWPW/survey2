@@ -104,7 +104,7 @@ function doInitPaperDate(data){
 		"<input id='paperId' style='display: none;' value='"+data.paperId+"'>"+
 		"<input id='paperType' style='display: none;' value='"+data.paperType+"'>"+
 		"<div id='paperTitle'><h1>"+data.paperTitle+"</h1></div>"+
-		"<div id='greet'><h4>"+data.greet+"</h4></div>"+
+		"<div id='greet'><span style='font-size:18px; white-space:pre-line'>"+data.greet+"</span></div>"+
 		"<div id='quesDivs'></div>"+
 		"<input id='thank' style='display: none;' value='"+data.thank+"'>"+
 		"<input id='termsUrl' style='display: none;' value='"+data.termsUrl+"'>";
@@ -205,7 +205,7 @@ function doAddEsay(quesDiv){
 	var optionDiv = 
 		"<div class='option'>"+
 			"<div>"+
-				"<textarea class='esayResult' rows='3' cols='41' placeholder='"+content+"'></textarea>"+
+				"<textarea class='esayResult' rows='3' cols='41' placeholder='"+content+"' style='width:100%;'></textarea>"+
 			"</div>"+
 		"</div>";
 	quesDiv.append(optionDiv);
