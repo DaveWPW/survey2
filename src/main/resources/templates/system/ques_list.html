@@ -74,6 +74,7 @@ function doGetObjects(){
 	var url = "ques/doFindQuesList";
 	var pageCurrent = $("#pageId").data("pageCurrent");
 	if(!pageCurrent){
+		pageCurrent = 1;
 		$("#pageId").data("pageCurrent", 1);
 	}
 	var params = {"pageCurrent" : pageCurrent}
