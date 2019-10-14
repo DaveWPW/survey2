@@ -69,7 +69,9 @@ function doQueryObjects(){
 function doGetObjects(){
 	var url = "result/doFindResultList";
 	var pageCurrent = $("#pageId").data("pageCurrent");
-	if(!pageCurrent)pageCurrent = 1;
+	if(!pageCurrent){
+		$("#pageId").data("pageCurrent", 1);
+	}
 	var params = {"pageCurrent" : pageCurrent}
 	params.paperName = $("#searchNameId").val().trim();
 	params.startDate = $("#startDate").val();

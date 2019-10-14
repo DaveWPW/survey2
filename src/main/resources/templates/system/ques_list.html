@@ -73,7 +73,9 @@ function doQueryObjects(){
 function doGetObjects(){
 	var url = "ques/doFindQuesList";
 	var pageCurrent = $("#pageId").data("pageCurrent");
-	if(!pageCurrent)pageCurrent = 1;
+	if(!pageCurrent){
+		$("#pageId").data("pageCurrent", 1);
+	}
 	var params = {"pageCurrent" : pageCurrent}
 	params.quesName = $("#searchNameId").val().trim();
 	$.getJSON(url, params, function(result){

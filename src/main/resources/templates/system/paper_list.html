@@ -71,7 +71,9 @@ function doQueryObjects(){
 function doGetObjects(){
 	var url = "paper/doFindPaperList";
 	var pageCurrent = $("#pageId").data("pageCurrent");
-	if(!pageCurrent)pageCurrent = 1;
+	if(!pageCurrent){
+		$("#pageId").data("pageCurrent", 1);
+	}
 	var params = {"pageCurrent" : pageCurrent}
 	params.paperName = $("#searchNameId").val().trim();
 	$.getJSON(url, params, function(result){
