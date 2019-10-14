@@ -109,7 +109,7 @@ function doInitPaperDate(data){
 		"<input id='paperId' style='display: none;' value='"+data.paperId+"'>"+
 		"<input id='paperType' style='display: none;' value='"+data.paperType+"'>"+
 		"<div id='paperTitle'><h1>"+data.paperTitle+"</h1></div>"+
-		"<div id='greet'><span style='font-size:18px; white-space:pre-line'>"+data.greet+"</span></span></div>"+
+		"<div id='greet'><span style='font-size:16px; white-space:pre-line'>"+data.greet+"</span></span></div>"+
 		"<div style='margin-right:20px; margin-left:5px;'>"+
 	  		"<div style='width:10%; float:left;' align='center'><span class='progress-num'>1</span>/<span class='progress-sum'>"+data.quesSum+"</span></div>"+
 			"<div class='progress' style='width:90%;'>"+
@@ -365,7 +365,7 @@ function doSubmit(){
 			if(result.state == 1){
 				var thank = $("#thank").val();
 				$("#paperDiv").remove();
-				var div = "<div><h4>"+thank+"</h4></div>";
+				var div = "<div><span style='font-size:20px; white-space:pre-line'>"+thank+"</span></div>";
 				$("#thanks").append(div);
 				$(".box-button").hide();
 			}else{
