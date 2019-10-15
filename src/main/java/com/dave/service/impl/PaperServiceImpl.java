@@ -134,7 +134,7 @@ public class PaperServiceImpl implements PaperService {
             pageCurrent = 1;
             startIndex = (pageCurrent-1) * pageSize;
         }
-        List<Paper> records = paperDao.findPaperList(startIndex, pageSize*pageCurrent, paperName);
+        List<Paper> records = paperDao.findPaperList(startIndex, pageSize, paperName);
         PageObject<Paper> pageObject = new PageObject<>();
         pageObject.setPageCurrent(pageCurrent);
         pageObject.setRowCount(rowCount);

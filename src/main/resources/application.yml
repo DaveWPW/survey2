@@ -5,6 +5,9 @@ server:
     context-path: /survey
 #spring配置
 spring:
+  mvc:
+    favicon:
+      enabled: false
   #数据源配置
   datasource:
     #配置mysql数据库

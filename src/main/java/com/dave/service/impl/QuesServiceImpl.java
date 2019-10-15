@@ -45,7 +45,7 @@ public class QuesServiceImpl implements QuesService {
             pageCurrent = 1;
             startIndex = (pageCurrent-1) * pageSize;
         }
-        List<Ques> records = quesDao.findQuesList(startIndex, pageSize*pageCurrent, quesName);
+        List<Ques> records = quesDao.findQuesList(startIndex, pageSize, quesName);
         PageObject<Ques> pageObject = new PageObject<>();
         pageObject.setPageCurrent(pageCurrent);
         pageObject.setRowCount(rowCount);

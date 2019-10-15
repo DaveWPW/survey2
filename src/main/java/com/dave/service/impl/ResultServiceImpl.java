@@ -45,7 +45,7 @@ public class ResultServiceImpl implements ResultService {
             pageCurrent = 1;
             startIndex = (pageCurrent-1) * pageSize;
         }
-        List<Result> records = resultDao.findResultList(startIndex, pageSize*pageCurrent, paperName, startDate, endDate);
+        List<Result> records = resultDao.findResultList(startIndex, pageSize, paperName, startDate, endDate);
         PageObject<Result> pageObject = new PageObject<>();
         pageObject.setPageCurrent(pageCurrent);
         pageObject.setRowCount(rowCount);
