@@ -3,11 +3,10 @@ package com.dave.dao;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
-import org.apache.ibatis.annotations.Update;
 
-//import com.dave.common.vo.CheckBox;
 import com.dave.entity.Role;
 
 /**
@@ -38,8 +37,8 @@ public interface RoleDao {
 	@Select("select username from su_uesr where status = 1 and role_id = #{roleId}")
 	List<String> findRoleUse(@Param("roleId") int roleId);
 	
-	@Update("update su_role set status = 0, modify_user = #{username}, modify_time = now() where role_id = #{roleId}")
-	int deleteRole(@Param("username") String username, @Param("roleId") int roleId);
+	@Delete("delete from su_role where role_id = #{roleId}")
+	int deleteRole( @Param("roleId") int roleId);
 	
 	@Select("select role_id, role_name from su_role where status=1")
 	List<Map<String, Object>> findRoles();

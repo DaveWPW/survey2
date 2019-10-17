@@ -100,11 +100,11 @@ public class RoleServiceImpl implements RoleService {
 	public String deleteRole(int roleId) {
 		List<String> users = roleDao.findRoleUse(roleId);
 		if(users.size() == 0) {
-			User user = ShiroUtil.getCurrentUser();
-			int row = roleDao.deleteRole(user.getUsername(), roleId);
+			int row = roleDao.deleteRole(roleId);
 			if(row != 1) {
 				return "Delete Failed!!";
 			}
+			roleMenuDao.deleteRoleMenu(roleId);
 		} else {
 			return users.toString();
 		}

@@ -3,7 +3,6 @@ package com.dave.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -11,10 +10,8 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import com.dave.common.util.ShiroUtil;
 import com.dave.entity.User;
 import com.dave.entity.vo.PaperInfo;
-import com.dave.service.MenuService;
 import com.dave.service.SurveyService;
 
 /**
@@ -63,8 +60,9 @@ public class PageController {
 			System.out.println("/survey/doSurveyUI.do?mobile="+mobile+"&language="+language+"&cli="+cli+"&agentId="+agentId+"&inviteTime="+inviteTime+"&paperName="+paperName);
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			long userDate = simpleDateFormat.parse(inviteTime).getTime();
-			long nowDate = new Date().getTime();
-			if(7*24*3600*1000 > nowDate-userDate) {
+			long nowDate = System.currentTimeMillis();
+			long dayTimeMillis = 7*24*3600*1000;
+			if(dayTimeMillis > nowDate-userDate) {
 				PaperInfo paperInfo = surveyService.findStartPaper(paperName, language);
 				if(!(paperInfo == null || StringUtils.isEmpty(paperInfo))) {
 					model.addAttribute("language", language);

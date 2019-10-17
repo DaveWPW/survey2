@@ -100,23 +100,20 @@ public class ResultServiceImpl implements ResultService {
 		cell.setCellValue("Agent ID");
 		cell = row.createCell(4);
 		cell.setCellStyle(style);
-		cell.setCellValue("P Type");
+		cell.setCellValue("Language");
 		cell = row.createCell(5);
 		cell.setCellStyle(style);
-		cell.setCellValue("Language");
+		cell.setCellValue("No");
 		cell = row.createCell(6);
 		cell.setCellStyle(style);
-		cell.setCellValue("No");
+		cell.setCellValue("Q Type");
 		cell = row.createCell(7);
 		cell.setCellStyle(style);
-		cell.setCellValue("Q Type");
+		cell.setCellValue("Question");
 		cell = row.createCell(8);
 		cell.setCellStyle(style);
-		cell.setCellValue("Question");
-		cell = row.createCell(9);
-		cell.setCellStyle(style);
 		cell.setCellValue("Answer");
-		cell = row.createCell(10);
+		cell = row.createCell(9);
 		cell.setCellStyle(style);
 		cell.setCellValue("Time");
 		for (int i = 0; i < resultList.size(); i++) {
@@ -126,19 +123,13 @@ public class ResultServiceImpl implements ResultService {
 			row.createCell(1).setCellValue(info.getMobileNum());
 			row.createCell(2).setCellValue(info.getCli());
 			row.createCell(3).setCellValue(info.getAgentId());
-			if("01".equals(info.getPaperType())) {
-				info.setPaperType("单张");
-			}else if("02".equals(info.getPaperType())) {
-				info.setPaperType("分支");
-			}
-			row.createCell(4).setCellValue(info.getPaperType());
 			if("ch".equals(info.getPaperLanguage())) {
 				info.setPaperLanguage("中文");
 			}else if("eng".equals(info.getPaperLanguage())) {
 				info.setPaperLanguage("英文");
 			}
-			row.createCell(5).setCellValue(info.getPaperLanguage());
-			row.createCell(6).setCellValue(info.getQuesNum());
+			row.createCell(4).setCellValue(info.getPaperLanguage());
+			row.createCell(5).setCellValue(info.getQuesNum());
 			if("01".equals(info.getQuesType())) {
 				info.setQuesType("单选题");
 			}else if("02".equals(info.getQuesType())) {
@@ -146,14 +137,14 @@ public class ResultServiceImpl implements ResultService {
 			}else if("03".equals(info.getQuesType())) {
 				info.setQuesType("简答题");
 			}
-			row.createCell(7).setCellValue(info.getQuesType());
-			row.createCell(8).setCellValue(info.getQuesName());
-			row.createCell(9).setCellValue(info.getOptionContent());
+			row.createCell(6).setCellValue(info.getQuesType());
+			row.createCell(7).setCellValue(info.getQuesName());
+			row.createCell(8).setCellValue(info.getOptionContent());
 			SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 			String dateStr = dateFormat.format(info.getCreateTime());
-			row.createCell(10).setCellValue(dateStr);
+			row.createCell(9).setCellValue(dateStr);
 		}
-		for (int i = 0; i <= 10; i++) {
+		for (int i = 0; i <= 9; i++) {
 			sheet.autoSizeColumn(i);
 		}
 		return wb;
