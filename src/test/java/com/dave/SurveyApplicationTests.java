@@ -18,46 +18,12 @@ import java.util.UUID;
 @RunWith(SpringRunner.class)
 @SpringBootTest
 public class SurveyApplicationTests {
-    @Autowired
-    private UserDao userDao;
-    @Autowired
-    private RoleDao roleDao;
-    @Autowired
-    private RoleMenuDao roleMenuDao;
     @Test
     public void addUser() {
-        User user = new User();
-        user.setUsername("admin");
-        user.setRealName("system admin");
-        String salt = UUID.randomUUID().toString();
-        SimpleHash sHash = new SimpleHash("MD5", "123456", salt);
-        user.setPassword(sHash.toHex());
-        user.setPasswordSalt(salt);
-        user.setRoleId(1);
-        user.setStaffId("20056254");
-        user.setCreateUser("admin");
-        user.setCreateTime(new Date());
-        user.setModifyUser("admin");
-        user.setModifyTime(new Date());
-        user.setStatus(1);
-        userDao.addUser(user);
     }
 
     @Test
     public void addRole(){
-        Role role = new Role();
-        role.setRoleName("admin");
-        role.setRoleNote("超级管理员");
-        role.setCreateUser("admin");
-        role.setCreateTime(new Date());
-        role.setModifyUser("admin");
-        role.setModifyTime(new Date());
-        role.setStatus(1);
-        Integer[] menuIds = new Integer[]{1, 2, 3, 4, 5, 6};
-        int roleId = roleDao.addRole(role);
-        for(int menuId : menuIds) {
-            roleMenuDao.addRoleMenu(roleId, menuId);
-        }
     }
 
 }
