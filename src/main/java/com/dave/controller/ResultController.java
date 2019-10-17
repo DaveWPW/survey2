@@ -9,6 +9,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -38,6 +39,7 @@ public class ResultController {
 	 * 
 	 * @return system/result_list
 	 */
+	@RequiresPermissions("S4")
     @RequestMapping("doResultListUI")
 	public String doQuesListUI() {
 		return "system/result_list";

@@ -3,13 +3,13 @@ package com.dave.controller;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-//import com.dave.common.vo.CheckBox;
 import com.dave.common.vo.JsonResult;
 import com.dave.entity.Role;
 import com.dave.service.RoleService;
@@ -31,6 +31,7 @@ public class RoleController {
 	 * 
 	 * @return system/role_list
 	 */
+	@RequiresPermissions(value = {"S1", "S6"})
 	@RequestMapping("doRoleListUI")
 	public String doRoleListUI() {
 		return "system/role_list";
@@ -58,15 +59,15 @@ public class RoleController {
     	if(role == null) {
     		return new JsonResult("保存对象不能为空");
     	}
-    	int count = roleService.findRoleByRoleName(role.getRoleName());
-    	if(count > 0){
-			return new JsonResult("角色名称以存在");
-		}
     	if(StringUtils.isEmpty(role.getRoleName())) {
     		return new JsonResult("角色名称不能为空");
     	}
     	if(StringUtils.isEmpty(role.getMenuIds()) || role.getMenuIds().length <= 0) {
     		return new JsonResult("菜单不能为空");
+    	}
+    	int count = roleService.findRoleByRoleName(role.getRoleName());
+    	if(count > 0) {
+    		return new JsonResult("该角色名称已经存在！");
     	}
     	int row = roleService.addRole(role);
     	if(row == 1) {
@@ -117,9 +118,9 @@ public class RoleController {
     		return new JsonResult("保存对象不能为空");
     	}
     	String admin = "admin";
-		if(admin.equals(role.getRoleName())){
-			return new JsonResult("禁止修改admin角色");
-		}
+    	if(admin.equals(role.getRoleName())) {
+    		return new JsonResult("禁止修改admin角色！！");
+    	}
     	if(StringUtils.isEmpty(role.getRoleId())) {
     		return new JsonResult("角色ID不能为空");
     	}
@@ -148,9 +149,9 @@ public class RoleController {
     	if(StringUtils.isEmpty(roleId)) {
     		return new JsonResult("角色ID不能为空");
     	}
-		if(roleId == 1){
-			return new JsonResult("禁止删除admin角色");
-		}
+    	if(roleId == 2) {
+    		return new JsonResult("禁止删除admin角色！！");
+    	}
 		String info = roleService.deleteRole(roleId);
 		if(info == null) {
 			if("Delete Failed!!".equals(info)) {

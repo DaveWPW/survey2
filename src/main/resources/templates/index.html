@@ -23,11 +23,11 @@
   		<span style="color:white; margin:10px 0px 15px 5px; font-size:26px;" >Survey Syetem</span>
 	  	<div style="float:right; width:30%; color:white;">
 		    <span>Username:&nbsp;</span>
-		    <span th:text="${username}"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		    <span id="username"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 			<span>Staff&nbsp;ID:&nbsp;</span>
-			<span th:text="${staffId}"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			<span id="staffId"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 			<span>Role:&nbsp;</span>
-			<span th:text="${roleName}"></span>
+			<span id="roleName"></span>
 	  	</div>
   	</div>
   </header>
@@ -93,15 +93,19 @@ $(function(){
 	doLoadUI("load-role-id","role/doRoleListUI");
 })
 function doShowPageUI(){
-	var level = $("#level").val();
-	level = level.replace(/\s*/g,"");
-	level = level.replace("[", "");
-	level = level.replace("]", "");
-	var array = level.split(",");
-	for(var i = 0; i < array.length; i++){
-		var id = array[i];
-		$("#"+id).show();
-	}
+    var url = "doShowUI";
+    $.post(url, function(result){
+        if(result.state == 1){
+            $("#username").html(result.data.username);
+            $("#staffId").html(result.data.staffId);
+            $("#roleName").html(result.data.roleName);
+            var level = result.data.level;
+            for(var i = 0; i < level.length; i++){
+                var id = level[i];
+                $("#"+id).show();
+            }
+        }
+    });
 }
 function doLoadUI(id, url){
 	$("#"+id).click(function(){

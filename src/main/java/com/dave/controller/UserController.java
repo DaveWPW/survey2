@@ -1,6 +1,7 @@
 package com.dave.controller;
 
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -29,6 +30,7 @@ public class UserController {
 	 * 
 	 * @return system/user_list
 	 */
+	@RequiresPermissions(value = {"S1", "S5"})
     @RequestMapping("doUserListUI")
 	public String doUserListUI(){
 		return "system/user_list";
@@ -70,7 +72,7 @@ public class UserController {
     	}
     	User userData = userService.findUserByUserName(user.getUsername());
     	if(userData != null){
-    		return new JsonResult("登录账号已存在");	
+    		return new JsonResult("用户名已存在");	
     	}
     	int rows = userService.addUser(user);
     	if(rows != 1) {
@@ -125,29 +127,26 @@ public class UserController {
     	if(user == null) {
     		return new JsonResult("保存对象不能为空");
     	}
-		String admin = "admin";
-		if(admin.equals(user.getUsername()) && user.getIsRestPassword() == 0) {
-			return new JsonResult("禁止修改admin用户！！");
-		}
-		if(admin.equals(user.getUsername()) && user.getRoleId() != 1) {
-			return new JsonResult("禁止修改admin用户角色！！");
-		}
-		if(StringUtils.isEmpty(user.getUserId())) {
-			return new JsonResult("用户ID不能为空");
-		}
-		if(StringUtils.isEmpty(user.getUsername())) {
-			return new JsonResult("用户名不能为空");
-		}
-		if(StringUtils.isEmpty(user.getRealName())) {
-			return new JsonResult("真实名不能为空");
-		}
-		if(StringUtils.isEmpty(user.getStaffId())) {
-			return new JsonResult("员工号不能为空");
-		}
-		if(StringUtils.isEmpty(user.getRoleId())) {
-			return new JsonResult("角色ID不能为空");
-		}
-		int row = userService.updateUser(user);
+    	String admin = "admin";
+    	if(admin.equals(user.getUsername()) && user.getIsRestPassword() == 0) {
+    		return new JsonResult("禁止修改admin用户！！");
+    	}
+    	if(admin.equals(user.getUsername()) && user.getRoleId() != 2) {
+    		return new JsonResult("禁止修改admin用户！！");
+    	}
+    	if(StringUtils.isEmpty(user.getUserId())) {
+    		return new JsonResult("用户ID不能为空");
+    	}
+    	if(StringUtils.isEmpty(user.getUsername())) {
+    		return new JsonResult("用户名不能为空");
+    	}
+    	if(StringUtils.isEmpty(user.getStaffId())) {
+    		return new JsonResult("员工号不能为空");
+    	}
+    	if(StringUtils.isEmpty(user.getRoleId())) {
+    		return new JsonResult("角色ID不能为空");
+    	}
+    	int row = userService.updateUser(user);
     	if(row == 1) {
     		User currentUser = ShiroUtil.getCurrentUser();
     		String username = currentUser.getUsername();
@@ -171,9 +170,9 @@ public class UserController {
     	if(StringUtils.isEmpty(userId)) {
     		return new JsonResult("用户ID不能为空");
     	}
-		if(userId == 1) {
-			return new JsonResult("禁止删除admin用户！！");
-		}
+    	if(userId == 1) {
+    		return new JsonResult("禁止删除admin用户！！");
+    	}
     	User user = (User)SecurityUtils.getSubject().getPrincipal();
     	int id = user.getUserId();
     	if(id == userId) {

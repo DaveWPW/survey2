@@ -28,8 +28,6 @@ import com.dave.service.SurveyService;
 public class PageController {
 	@Autowired
     private SurveyService surveyService;
-	@Autowired
-    private MenuService menuService;
 	
 	/**
 	 * 登录页面
@@ -45,15 +43,10 @@ public class PageController {
 	 * @return index
 	 */
 	@RequestMapping("doIndexUI")
-	public String doIndexUI(Model model){
-		User currentUser = ShiroUtil.getCurrentUser();
-		List<String> level = menuService.findRoleMenuLevelById(currentUser.getRoleId());
-		model.addAttribute("level", level);
-		model.addAttribute("username", currentUser.getUsername());
-		model.addAttribute("roleName", currentUser.getRoleName());
-		model.addAttribute("staffId", currentUser.getStaffId());
+	public String doIndexUI(){
 		return "index";
 	}
+
 	/**
 	 * 分页部分
 	 * @return common/page

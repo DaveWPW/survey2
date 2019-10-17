@@ -4,6 +4,7 @@ import java.util.Iterator;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.StringUtils;
@@ -33,6 +34,7 @@ public class QuesController {
 	 * 
 	 * @return system/ques_list
 	 */
+	@RequiresPermissions("S2")
     @RequestMapping("doQuesListUI")
 	public String doQuesListUI(){
 		return "system/ques_list";

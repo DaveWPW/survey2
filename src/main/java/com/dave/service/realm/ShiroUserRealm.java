@@ -1,21 +1,23 @@
 package com.dave.service.realm;
 
-import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.AuthenticationInfo;
-import org.apache.shiro.authc.AuthenticationToken;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.authc.UnknownAccountException;
+import com.dave.dao.MenuDao;
+import com.dave.dao.UserDao;
+import com.dave.entity.User;
+import org.apache.log4j.Logger;
+import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.authz.AuthorizationInfo;
+import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.util.ByteSource;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
-import com.dave.dao.UserDao;
-import com.dave.entity.User;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Realm实现类
@@ -24,8 +26,11 @@ import com.dave.entity.User;
  *
  */
 public class ShiroUserRealm extends AuthorizingRealm {
+	private static Logger logger = Logger.getLogger(ShiroUserRealm.class);
 	@Autowired
 	private UserDao userDao;
+	@Autowired
+	private MenuDao menuDao;
 	@Override
 	public void setCredentialsMatcher(CredentialsMatcher credentialsMatcher) {
 		HashedCredentialsMatcher cMatcher = new HashedCredentialsMatcher();
@@ -38,6 +43,7 @@ public class ShiroUserRealm extends AuthorizingRealm {
 		String username = (String)token.getPrincipal();
 		User user = userDao.findUserByUserName(username);
 		if(user == null) {
+			logger.info("用户不存在");
 			throw new UnknownAccountException();
 		}
 		ByteSource credentialsSalt = ByteSource.Util.bytes(user.getPasswordSalt());
@@ -46,8 +52,21 @@ public class ShiroUserRealm extends AuthorizingRealm {
 		return info;
 	}
 	@Override
-	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection arg0) {
-		// TODO Auto-generated method stub
-		return null;
+	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
+		User user = (User)principals.getPrimaryPrincipal();
+		List<String> level = menuDao.findRoleMenuLevelById(user.getRoleId());
+		if(level == null || level.size() == 0) {
+			logger.info("用户角色不存在菜单权限");
+			return null;
+		}
+		Set<String> permissionSet = new HashSet<>();
+		for(String permission : level){
+			if(!StringUtils.isEmpty(permission)){
+				permissionSet.add(permission);
+			}
+		}
+		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+		info.setStringPermissions(permissionSet);
+		return info;
 	}
 }

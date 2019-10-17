@@ -1,5 +1,10 @@
 package com.dave.controller;
 
+import com.dave.common.util.ShiroUtil;
+import com.dave.common.vo.JsonResult;
+import com.dave.entity.User;
+import com.dave.service.MenuService;
+import com.dave.service.UserService;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -13,10 +18,10 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.dave.common.util.ShiroUtil;
-import com.dave.common.vo.JsonResult;
-import com.dave.entity.User;
-import com.dave.service.UserService;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Login控制层
  * 
@@ -28,7 +33,8 @@ import com.dave.service.UserService;
 public class LoginController {
 	@Autowired
 	private UserService userService;
-	
+	@Autowired
+	private MenuService menuService;
 	/**
 	 * 登录
 	 * 
@@ -94,5 +100,17 @@ public class LoginController {
 		}
 		return new JsonResult("Update Failed!!");
     }
-	
+
+	@RequestMapping("doShowUI")
+	@ResponseBody
+    private JsonResult doShowUI(){
+		User currentUser = ShiroUtil.getCurrentUser();
+		List<String> level = menuService.findRoleMenuLevelById(currentUser.getRoleId());
+		Map<String, Object> map = new HashMap<>();
+		map.put("level", level);
+		map.put("username", currentUser.getUsername());
+		map.put("staffId", currentUser.getStaffId());
+		map.put("roleName", currentUser.getRoleName());
+		return new JsonResult(map);
+	}
 }
