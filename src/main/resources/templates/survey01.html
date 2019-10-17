@@ -88,9 +88,13 @@ function doGetObjects(){
 		if(result.state == 1){
 			doInitPaperDate(result.data);
 			var params = {"quesIds" : result.data.quesIds.toString()}
-			var url = "paper/doSelectQues";
+			var url = "survey/doSelectQues";
 			$.post(url, params, function(result){
-				doInitQuesDate(result.data);
+				if(result.state == 1){
+					doInitQuesDate(result.data);
+				}else{
+					alert(result.message);
+				}
 			});
 		}else{
 			alert(result.message);

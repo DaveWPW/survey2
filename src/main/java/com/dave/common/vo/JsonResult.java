@@ -3,19 +3,19 @@ package com.dave.common.vo;
 import java.io.Serializable;
 
 /**
- * JSON处理类
+ * Json值对象
  * 
  * @author Dave20190823
  *
  */
 public class JsonResult implements Serializable{
 	private static final long serialVersionUID = -2040132524942880840L;
-	/** 状态码:1表示正确,0表示错误 */
+	/**状态码:1表示正确，0表示错误*/
 	private int state = 0;//error
-	/** 状态码对应的消息 */
-	private String message = "ok";
-	/** 要呈现的正确数据 */
-	private Object data;//必须为data
+	/**消息*/
+	private String message = "succeed";
+	/**数据*/
+	private Object data;
 	
 	public JsonResult() {}
 	public JsonResult(String message, int state) {

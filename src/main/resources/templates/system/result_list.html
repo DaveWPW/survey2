@@ -22,7 +22,7 @@
 	    <table class="table table-hover text-center">
 	      <thead>
 		    <tr>
-		      <th><input type="checkbox" id="checkAllId">全选</th>
+		      <th style="text-align:left;"><input type="checkbox" id="checkAllId">全选</th>
 			  <th>用户手机号</th>
 			  <th>CLI</th>
 			  <th>Agent ID</th>
@@ -121,14 +121,14 @@ function doCreateTds(data){
 		language = "英文";
 	}
 	var tds=
-		"<td><input type='checkbox' name='resultId' class='resultId' value='"+data.resultId+"'><span class='numberClass'></span></td>"+
+		"<td style='text-align:left;'><input type='checkbox' name='resultId' class='resultId' value='"+data.resultId+"'><span class='numberClass'></span></td>"+
 	    "<td><input type='button' value='"+data.mobileNum+"' class='btn-open'></td>"+
 	    "<td>"+data.cli+"</td>"+
 	    "<td>"+data.agentId+"</td>"+
 	    "<td>"+data.paperName+"</td>"+
 	    "<td>"+language+"</td>"+
 	    "<td>"+type+"</td>"+
-	    "<td>"+data.createTime+"</td>";
+	    "<td>"+new Date(data.createTime).toLocaleString()+"</td>";
     return tds;
 }
 //页面数据自增序列号

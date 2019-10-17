@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dave.dao.ResultDao">
-    <insert id="addResult" parameterType="com.dave.entity.Result"  useGeneratedKeys="true" keyProperty="resultId">
+	<insert id="addResult" parameterType="com.dave.entity.Result" useGeneratedKeys="true" keyProperty="resultId">
      	insert into su_result
       	(mobile_num, cli, agent_id, paper_id, paper_name, paper_type, paper_language,
       	invite_time, create_time, status)
       	values
-		(#{mobileNum}, #{cli}, #{agentId}, #{paperId}, #{paperName}, #{paperType},
-		#{paperLanguage}, #{inviteTime}, #{createTime}, #{status})
+		(#{mobileNum}, #{cli}, #{agentId}, #{paperId}, #{paperName},
+		#{paperType}, #{paperLanguage}, #{inviteTime}, #{createTime}, #{status})
 	</insert>
-    <select id="findResultList" resultType="com.dave.entity.Result">
-        select * from su_result where status = 1
-        <if test="paperName != null and '' != paperName">
-            and paper_name like concat('%', #{paperName}, '%')
-        </if>
-        <if test="startDate != null and '' != startDate">
-            and create_time <![CDATA[>=]]>  str_to_date(#{startDate}, '%Y-%m-%d %H')
-        </if>
-        <if test="endDate != null and '' != endDate">
-            and create_time <![CDATA[<=]]> date_add(str_to_date(#{endDate}, '%Y-%m-%d %H'), interval 1 day)
-        </if>
-        order by create_time desc
-        limit #{startIndex}, #{pageSize}
-    </select>
-    <select id="exportSurveyResult" resultType="com.dave.entity.vo.ResultExportInfo">
-        select r.*, eq.* from su_result r
-        left join su_result_ques eq on r.result_id = eq.result_id
-        where r.status = 1
-        <if test="paperName != null and '' != paperName">
-            and r.paper_name like concat('%', #{paperName}, '%')
-        </if>
-        <if test="startDate != null and '' != startDate">
-            and r.create_time <![CDATA[>=]]>  str_to_date(#{startDate}, '%Y-%m-%d %H')
-        </if>
-        <if test="endDate != null and '' != endDate">
-            and r.create_time <![CDATA[<=]]> date_add(str_to_date(#{endDate}, '%Y-%m-%d %H'), interval 1 day)
-        </if>
-        order by r.paper_name, eq.result_id, r.create_time desc, eq.ques_num asc
-    </select>
+	<select id="findResultList" resultType="com.dave.entity.Result">
+		select * from su_result where status = 1
+		<if test="paperName != null and '' != paperName">
+			and paper_name like concat('%', #{paperName}, '%')
+		</if>
+		<if test="startDate != null and '' != startDate">
+			and create_time <![CDATA[>=]]>  str_to_date(#{startDate}, '%Y-%m-%d %H')
+		</if>
+		<if test="endDate != null and '' != endDate">
+			and create_time <![CDATA[<=]]> date_add(str_to_date(#{endDate}, '%Y-%m-%d %H'), interval 1 day)
+		</if>
+		order by create_time desc
+		limit #{startIndex}, #{pageSize}
+	</select>
+	<select id="exportResult" resultType="com.dave.entity.vo.ResultExportInfo">
+		select r.*, eq.* from su_result r 
+		left join su_result_ques eq on r.result_id = eq.result_id 
+		where r.status = 1
+		<if test="paperName != null and '' != paperName">
+			and r.paper_name like concat('%', #{paperName}, '%')
+		</if>
+		<if test="startDate != null and '' != startDate">
+			and r.create_time <![CDATA[>=]]>  str_to_date(#{startDate}, '%Y-%m-%d %H')
+		</if>
+		<if test="endDate != null and '' != endDate">
+			and r.create_time <![CDATA[<=]]> date_add(str_to_date(#{endDate}, '%Y-%m-%d %H'), interval 1 day)
+		</if>
+		order by r.paper_name, eq.result_id, r.create_time desc, eq.ques_num asc
+	</select>
 </mapper>

@@ -1,12 +1,15 @@
 package com.dave.entity;
 
+import java.io.Serializable;
+
 /**
  * 调查结果问题PO
  * 
  * @author Dave20190904
  *
  */
-public class ResultQues {
+public class ResultQues implements Serializable{
+	private static final long serialVersionUID = -8291550348358293834L;
 	private Integer resultQuesId;
 	private Integer resultId;
 	private Integer quesNum;

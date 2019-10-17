@@ -16,7 +16,7 @@ import com.dave.entity.QuesOption;
 public interface QuesOptionDao {
 	
 	int addOption(QuesOption option);
-
+	
 	int deleteOption(@Param("quesId") int quesId);
 	
 	@Select("select * from su_ques_option where ques_id = #{quesId} and status = 1 order by option_id asc")

@@ -14,4 +14,5 @@ public interface SurveyService {
 	PaperInfo findStartPaper(String paperName, String paperLanguage);
 	
 	int submitSurveyResult(ResultInfo resultInfo);
+	
 }

@@ -1,12 +1,15 @@
 package com.dave.entity.vo;
 
+import java.io.Serializable;
+
 /**
  * 调查结果VO
  * 
  * @author Dave20190904
  *
  */
-public class ResultInfo {
+public class ResultInfo implements Serializable{
+	private static final long serialVersionUID = 9006176143785726873L;
 	private Integer resultId;
 	private Long mobileNum;
 	private Long cli;

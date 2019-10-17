@@ -1,0 +1,137 @@
+<!-- Horizontal Form -->
+ <div class="box box-info">
+      <div class="box-header with-border">
+        <h3 class="box-title">添加用户</h3>
+      </div>
+      <!-- /.box-header -->
+      <!-- form start -->
+      <form class="form-horizontal">
+        <div class="box-body" style="margin-left:26%;">
+          <div class="form-group">
+            <label for="usernameId" class="col-sm-2 control-label">用户名：</label>
+            <div class="col-sm-10" style="width:300px;">
+              <input type="text" class="form-control" id="usernameId" style="width:300px;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="passwordId" class="col-sm-2 control-label">密码：</label>
+            <div id="passwordId" class="col-sm-10 checkbox icheck">
+              &nbsp;&nbsp;&nbsp;&nbsp;
+            </div>
+          </div>
+          <div class="form-group" >
+            <label for="realNameId" class="col-sm-2 control-label">真实名：</label>
+            <div class="col-sm-10" style="width:300px;">
+              <input type="text" class="form-control" id="realNameId" style="width:300px;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="staffId" class="col-sm-2 control-label">员工号：</label>
+            <div class="col-sm-10" style="width:300px;">
+              <input type="text" class="form-control" id="staffId" style="width:300px;">
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="rolesId" class="col-sm-2 control-label">角色：</label>
+            <div class="col-sm-10">
+	          <select id="roleId" class="form-control" style="width:100px;"></select>
+            </div>
+          </div>
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer">
+          <button type="button" class="btn btn-default btn-cancel">Cancel</button>
+          <button type="button" class="btn btn-info pull-right btn-save">Save</button>
+        </div>
+        <!-- /.box-footer -->
+      </form>
+    </div>
+<script type="text/javascript" src="bower_components/ztree/jquery.ztree.all.min.js"></script>
+<script type="text/javascript" src="bower_components/layer/layer.js"></script>
+<script type="text/javascript">
+$(document).ready(function(){
+	doLoadInitPage();
+	doInitFormData();
+	$(".box-footer")
+		.on("click", ".btn-cancel", doCancel)
+		.on("click", ".btn-save", doSaveOrUpdate);
+});
+function doCancel(){
+	$("#mainContentId").removeData("rowData");
+	$("#mainContentId").load("user/doUserListUI");
+}
+function doSaveOrUpdate(){
+	var rowData = $("#mainContentId").data("rowData");
+	var params = doGetEditFormData();
+	if(rowData){
+		params.userId = rowData.userId;
+	}
+	var insertUrl = "user/doAddUser";
+	var updateUrl = "user/doUpdateUser";
+	var url = rowData ? updateUrl : insertUrl;
+	$.post(url, params, function(result){
+		if(result.state == 1){
+			alert(result.message);
+			doCancel();
+		}else if(result.state == 2){
+			alert(result.message);
+			$("#mainContentId").removeData("rowData");
+			location.href="doLogout";
+		}else{
+			alert(result.message);
+		}
+	})
+}
+function doGetEditFormData(){
+	var params = {
+		username : $("#usernameId").val(),
+		isRestPassword : $("input[name='isRestPassword']:checked").val()==null ? 0:1,
+	    realName : $("#realNameId").val(),
+	    staffId : $("#staffId").val(),
+	    roleId : $("#roleId").val()
+	}
+	return params;
+}
+function doInitFormData(){
+    var data = $("#mainContentId").data("rowData");
+    if(!data){
+    	return;
+    }
+	$("#usernameId").val(data.username);
+	$("#usernameId").attr('disabled','disabled');
+	$("#realNameId").val(data.realName);
+	$("#staffId").val(data.staffId);
+	$("#roleId").val(data.roleId);
+}
+function doLoadInitPage(){
+    var div = $("#passwordId");
+    var input;
+    if($(".box-title").html() === "添加用户"){
+      input = "<input type='checkbox' name='isRestPassword' value='1'  onclick='return false;' checked='checked'>初始密码为 12345678";
+      div.append(input);
+    }else if($(".box-title").html() === "修改用户"){
+      input = "<input type='checkbox' name='isRestPassword' value='1'>重置密码为 12345678";
+      div.append(input);
+    }
+	var url="role/doFindRoles"
+	$.getJSON(url, function(result){
+		if(result.state == 1){
+			doInitPageRoles(result.data);
+			doInitFormData();
+		}else{
+			alert(result.message);
+		}
+	});
+}
+function doInitPageRoles(data){
+	var select = $("#roleId");
+	select.empty();
+	for(var i in data){
+		var option = "<option value='"+data[i].role_id+"'>"+data[i].role_name+"</option>";
+		select.append(option);
+	}
+}
+//console.log();
+//alert();
+//debugger;
+</script>

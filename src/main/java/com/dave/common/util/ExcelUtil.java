@@ -5,6 +5,12 @@ import org.apache.poi.ss.usermodel.Row;
 
 import java.text.NumberFormat;
 
+/**
+ * Excel工具类
+ * 
+ * @author Dave20190909
+ *
+ */
 public class ExcelUtil {
 
 	public static String getCellValue(Cell cell) {

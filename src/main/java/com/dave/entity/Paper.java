@@ -1,5 +1,6 @@
 package com.dave.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,7 +11,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author Dave20190828
  *
  */
-public class Paper {
+public class Paper implements Serializable{
+	private static final long serialVersionUID = 8756620219613741088L;
 	/**问卷ID*/
 	private Integer paperId;
 	/**问卷名称*/
@@ -19,7 +21,7 @@ public class Paper {
 	private String paperType;
 	/**语言种型*/
 	private String paperLanguage;
-	/**使用状态*/
+	/**使用状态 0：删除，1：使用， 9：禁用*/
 	private Integer status;
 	/**创建日期*/
 	@JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss",timezone="GMT+8")

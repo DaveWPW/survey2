@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dave.dao.RoleDao">
+     <insert id="addRole" parameterType="com.dave.entity.Role" useGeneratedKeys="true" keyProperty="roleId">
+     	insert into su_role
+      	(role_name, role_note, create_user, create_time, modify_user, modify_time, status)
+      	values
+		(#{roleName}, #{roleNote}, #{createUser}, #{createTime}, #{modifyUser}, #{modifyTime}, #{status})
+     </insert>
+     <select id="findRoleList" resultType="com.dave.entity.Role">
+		select * from su_role where status = 1
+		<if test="roleName != null and '' != roleName">
+			and role_name like concat('%', #{roleName}, '%')
+		</if>
+		order by role_id asc
+		limit #{startIndex}, #{pageSize}
+	</select>
+	<update id="updateRole" parameterType="com.dave.entity.Role">
+		update su_role set 
+		role_name = #{roleName}, role_note = #{roleNote}, 
+		modify_user = #{modifyUser}, modify_time = #{modifyTime} 
+		where role_id = #{roleId}
+	</update>
+</mapper>

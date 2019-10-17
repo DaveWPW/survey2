@@ -3,7 +3,8 @@
 <mapper namespace="com.dave.dao.PaperDao">
 	<select id="checkoutPaperName" resultType="int">
 		select count(*) from su_paper
-		where paper_name=#{paperName} and paper_language=#{paperLanguage} and status<![CDATA[!=]]>0
+		where paper_name = #{paperName} and paper_language = #{paperLanguage}
+		and status <![CDATA[!=]]> 0
 		<if test="paperId != null and '' != paperId">
 			and paper_id <![CDATA[!=]]> #{paperId}
 		</if>
@@ -17,7 +18,7 @@
 		#{paperTitle}, #{greet}, #{thank}, #{quesSum})
 	</insert>
 	<select id="findPaperList" resultType="com.dave.entity.Paper">
-		select * from su_paper where status<![CDATA[!=]]>0
+		select * from su_paper where status <![CDATA[!=]]> 0
 		<if test="paperName != null and '' != paperName">
 			and paper_name like concat('%', #{paperName}, '%')
 		</if>
@@ -25,10 +26,11 @@
 		limit #{startIndex}, #{pageSize}
 	</select>
 	<update id="updatePaper" parameterType="com.dave.entity.Paper">
-		update su_paper set
+		update su_paper set 
 		paper_name = #{paperName}, paper_language = #{paperLanguage},
-		paper_title = #{paperTitle}, greet = #{greet}, thank = #{thank},
-		ques_sum = #{quesSum}, modify_time = now()
+		paper_title = #{paperTitle}, greet = #{greet},
+		thank = #{thank}, ques_sum = #{quesSum},
+		modify_time = now()
 		where paper_id = #{paperId}
 	</update>
 </mapper>

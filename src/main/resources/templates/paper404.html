@@ -1,0 +1,54 @@
+<!DOCTYPE HTML>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+  <title>404</title>
+</head>
+<style>
+.body-backgauge{
+	margin-left:5%;
+	margin-right:5%;
+	margin-top:3%;
+}
+</style>
+<body class="body-backgauge">
+  <input id="paperLanguage" type="hidden" th:value="${language}"/>
+  <img alt="3logo" src="images/3logo_28-5-18.gif">
+  <div style="font-size:20px;">
+  	<span th:text="${chMessage}"></span><br/>
+  	<span th:text="${engMessage}"></span>
+  </div>
+  <div class="box-footer" style="background:#FFFFFF; position:fixed; bottom:0px; width:90%;">
+    <div style="float:left; width:40%; margin-top:2%">
+  	  <span>© 3HK |</span>
+  	  <a href="#" class="terms-url"><span id="text1"></span></a>
+    </div>
+    <div style="float:right; width:60%; margin-bottom:2%; margin-top:2%">
+  	  <div style="float:right;">
+  	    <img alt="signature" src="images/signature.png">
+      </div>
+    </div>
+  </div>
+</body>
+<script type="text/javascript" src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
+<script type="text/javascript">
+$(function(){
+	if($("#paperLanguage").val() === "ch"){
+		$("#text1").html("條款及細則");//页尾a标签提示
+	}else if($("#paperLanguage").val() === "eng"){
+		$("#text1").html("Terms & Conditions");
+	}
+	$(".box-footer").on("click",".terms-url", doTermsUrl);
+});
+function doTermsUrl(){
+	var url;
+	if($("#paperLanguage").val() === "ch"){
+		url = "https://www.three.com.hk/website/appmanager/three/home?_nfpb=true&pageid=zz6101&_pageLabel=P200470391219567710594&lang=chi";
+	}else if($("#paperLanguage").val() === "eng"){
+		url = "https://www.three.com.hk/website/appmanager/three/home?_nfpb=true&pageid=zz6101&_pageLabel=P200470391219567710594&lang=eng";
+	}
+	window.open(url, "_blank", "scrollbars=1, resizable=1, height=600, width=1100");
+}
+</script>

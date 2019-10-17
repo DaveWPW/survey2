@@ -20,9 +20,6 @@ public interface PaperDao {
 	
 	int addPaper(Paper paper);
 	
-//	@Select("select seq_paper_id.nextval from dual")
-//	int getPaperId();
-	
 	@Select("select count(*) from su_paper where status != 0")
 	int getAllPaperCount();
 	

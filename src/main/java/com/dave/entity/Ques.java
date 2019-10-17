@@ -1,5 +1,6 @@
 package com.dave.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,7 +11,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author Dave20190826
  *
  */
-public class Ques {
+public class Ques implements Serializable{
+	private static final long serialVersionUID = -3374587626274991819L;
 	/**问题ID*/
 	private int quesId;
 	/**问题名*/

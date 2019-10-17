@@ -1,12 +1,15 @@
 package com.dave.entity.vo;
 
+import java.io.Serializable;
+
 /**
  * 调查问题VO
  * 
  * @author Dave20190826
  *
  */
-public class QuesInfo {
+public class QuesInfo implements Serializable{
+	private static final long serialVersionUID = -8604666853701266L;
 	/**问题ID*/
 	private Integer quesId; 
 	/**问题名*/

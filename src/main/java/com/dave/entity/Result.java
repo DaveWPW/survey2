@@ -1,5 +1,6 @@
 package com.dave.entity;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -10,7 +11,8 @@ import com.fasterxml.jackson.annotation.JsonFormat;
  * @author Dave20190904
  *
  */
-public class Result {
+public class Result implements Serializable{
+	private static final long serialVersionUID = 9160847575755093799L;
 	private Integer resultId;
 	private Long mobileNum;
 	private Long cli;

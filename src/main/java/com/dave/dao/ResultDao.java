@@ -19,10 +19,7 @@ import com.dave.entity.vo.ResultExportInfo;
 public interface ResultDao {
 	
 	int addResult(Result result);
-	
-//	@Select("select seq_result_id.nextval from dual")
-//	int getResultId();
-	
+
 	@Select("select count(*) from su_result where status = 1")
 	int getAllResultCount();
 	
@@ -31,7 +28,6 @@ public interface ResultDao {
             @Param("paperName") String paperName, @Param("startDate") String startDate,
             @Param("endDate") String endDate);
 	
-//	@Delete("delete from su_result where result_id = #{resultId}")
 	@Update("update su_result set status = 0, modify_time = now() where result_id = #{resultId}")
 	int deleteResult(@Param("resultId") int resultId);
 	

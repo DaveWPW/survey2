@@ -1,10 +1,12 @@
 package com.dave.entity.vo;
 
+import java.io.Serializable;
 import java.util.Date;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 
-public class ResultExportInfo {
+public class ResultExportInfo implements Serializable{
+	private static final long serialVersionUID = -8933733261215094304L;
 	private String paperName;
 	private Long mobileNum;
 	private Long cli;

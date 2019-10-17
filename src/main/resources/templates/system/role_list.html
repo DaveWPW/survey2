@@ -1,0 +1,159 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="box">
+      <div class="box-header">
+        <h3 class="box-title">角色管理</h3>
+        <div class="box-tools">
+          <div class="input-group input-group-sm" style="width:300px;">
+		    <input type="text" name="table_search" id="searchNameId"
+							class="form-control pull-right" placeholder="请输入角色名称">
+            <div class="input-group-btn">
+			  <button type="button" class="btn btn-default btn-search">
+                <i class="fa fa-search"></i>
+			  </button>
+			  <button type="button" class="btn btn-default btn-add">添加</button>
+			</div>
+		  </div>
+		</div>
+	  </div>
+	  <!-- /.box-header -->
+	  <div class="box-body table-responsive no-padding">
+		  <table class="table table-hover text-center">
+			<thead>
+			  <tr>
+				 <th style="width:5%;">No.</th>
+				 <th>角色名称</th>
+				 <th>备注</th>
+				 <th>创建用户</th>
+				 <th>修改用户</th>
+				 <th>操作</th>
+			  </tr>
+			</thead>
+		    <tbody id="tbodyId"></tbody>
+		  </table>
+	  </div>
+	  <!-- /.box-body -->
+	  <div id="pageId" class="box-footer clearfix"></div>
+    </div>
+  <!-- /.box -->
+  </div>
+</div>
+<script type="text/javascript">
+$(function(){
+	$("#pageId").load("doPageUI",function(){
+		doGetObjects();
+	});
+	$(".input-group-btn")
+		.on("click", ".btn-add", doLoadEditUI)
+	  	.on("click", ".btn-search", doQueryRole);
+	$("#tbodyId")
+	  	.on("click", ".btn-update", doLoadEditUI)
+	  	.on("click", ".btn-delete", doDeleteRole);
+});
+
+function doLoadEditUI(){
+	var title;
+	if($(this).hasClass('btn-add')){
+		title = "添加角色";
+		doLoadPageUI(title);
+	}else{
+		title = "修改角色"
+		var roleId = $(this).parents("tr").data("roleId");
+		var params = {"roleId" : roleId};
+		var url = "role/doFindRoleById";
+		$.getJSON(url, params, function(result){
+			if(result.state == 1){
+				$("#mainContentId").data("data", result.data);
+				doLoadPageUI(title);  
+			}else{
+				alert(result.message);
+			}
+		});
+	}
+}
+function doLoadPageUI(title){
+	var url="role/doRoleEditUI"
+	$("#mainContentId").load(url,function(){
+		$(".box-title").html(title);
+	})
+}
+function doGetObjects(){
+	var pageCurrent = $("#pageId").data("pageCurrent");
+	if(!pageCurrent){
+		pageCurrent = 1;
+		$("#pageId").data("pageCurrent", 1);
+	}
+	var params = {"pageCurrent" : pageCurrent};
+	var roleName = $("#searchNameId").val();
+	if(roleName){
+		params.roleName = roleName;
+	}
+	var url="role/doFindRoleList";
+	$.getJSON(url, params, function(result){
+		doHandleResponseResult(result);
+	});
+}
+function doHandleResponseResult(result){   
+	if(result.state == 1){
+		doSetTableBodyRows(result.data.records);
+		doSetPagination(result.data);
+		autoAddNumber();//自增序列号
+	}
+}
+function doSetTableBodyRows(records){
+	var tBody=$("#tbodyId");
+	tBody.empty();
+	for(var i in records){
+		var tr = $("<tr></tr>");
+		tr.data("roleId", records[i].roleId);
+		var tds = doCreateTds(records[i]);
+		tr.append(tds);
+		tBody.append(tr);
+	}
+}
+function doCreateTds(row){
+	var tds = 
+		"<td><span class='numberClass'></span></td>"+
+		"<td>"+row.roleName+"</td>"+
+		"<td>"+row.roleNote+"</td>"+
+		"<td>"+row.createUser+"</td>"+
+		"<td>"+row.modifyUser+"</td>"+
+		"<td>"+
+			"<input type='button' class='btn-delete' value='删除'>"+
+			"&nbsp;&nbsp;"+
+			"<input type='button' class='btn-update' value='修改'>"+
+		"</td>";
+	return tds;
+}
+//页面数据自增序列号
+function autoAddNumber(){
+    var pageCurrent = $("#pageId").data("pageCurrent");
+    var pageNo = (pageCurrent-1) * 10;
+	function number(){
+	    var index = 0;
+    	for(var i = 0+pageNo;i < $(".numberClass").length+pageNo; i++){
+			$(".numberClass").get(index).innerHTML = i+1;
+			index++;
+    	}
+	}
+	number();
+}
+function doQueryRole(){
+	$("#pageId").data("pageCurrent", 1);
+	doGetObjects();
+}
+function doDeleteRole(){
+	if(window.confirm("您确定要删除吗？")){
+		var roleId = $(this).parents("tr").data("roleId");
+		var params = {"roleId" : roleId};
+		var url="role/doDeleteRole"
+		$.post(url, params, function(result){
+			if(result.state == 1){
+				doGetObjects();
+			}else{
+				alert(result.message);
+			}
+		});	
+	}
+}
+</script>

@@ -22,10 +22,7 @@ public interface QuesDao {
             @Param("startIndex") int startIndex, @Param("pageSize") int pageSize, @Param("quesName") String quesName);
 	
 	int addQues(Ques ques);
-	
-//	@Select("select seq_ques_id.nextval from dual")
-//	int getQuesId();
-	
+
 	int deleteQues(@Param("quesId") int quesId);
 	
 	@Select("select * from su_ques where ques_id = #{quesId} and status = 1")

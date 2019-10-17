@@ -3,6 +3,7 @@ package com.dave.controller;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -10,11 +11,14 @@ import org.springframework.ui.Model;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.dave.common.util.ShiroUtil;
+import com.dave.entity.User;
 import com.dave.entity.vo.PaperInfo;
+import com.dave.service.MenuService;
 import com.dave.service.SurveyService;
 
 /**
- * 匿名页面Controller
+ * Page控制层
  * 
  * @author Dave20190823
  * 
@@ -24,12 +28,30 @@ import com.dave.service.SurveyService;
 public class PageController {
 	@Autowired
     private SurveyService surveyService;
+	@Autowired
+    private MenuService menuService;
+	
+	/**
+	 * 登录页面
+	 * @return login
+	 */
+	@RequestMapping("doLoginUI")
+	public String doLoginUI(){
+		return "login";
+	}
+	
 	/**
 	 * 主页
 	 * @return index
 	 */
 	@RequestMapping("doIndexUI")
-	public String doIndexUI(){
+	public String doIndexUI(Model model){
+		User currentUser = ShiroUtil.getCurrentUser();
+		List<String> level = menuService.findRoleMenuLevelById(currentUser.getRoleId());
+		model.addAttribute("level", level);
+		model.addAttribute("username", currentUser.getUsername());
+		model.addAttribute("roleName", currentUser.getRoleName());
+		model.addAttribute("staffId", currentUser.getStaffId());
 		return "index";
 	}
 	/**
@@ -68,8 +90,20 @@ public class PageController {
 		} catch (ParseException e) {
 			e.printStackTrace();
 		}
+		model.addAttribute("language", language);
 		model.addAttribute("chMessage", "抱歉，此連結已經無效！");
 		model.addAttribute("engMessage", "Sorry , this link is no longer valid!");
-		return "404";	
+		return "paper404";
 	}
+	
+	/**
+	 * 修改用户密码页面
+	 * 
+	 * @return system/update_password
+	 */
+	@RequestMapping("doUpdatePasswordUI")
+	public String doUpdatePasswordUI() {
+		return "system/update_password";
+	}
+	
 }

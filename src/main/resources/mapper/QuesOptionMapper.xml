@@ -8,10 +8,10 @@
 		(#{quesId}, #{optionContent}, #{flag}, #{status})
 	</insert>
 	<update id="deleteOption">
-		update su_ques_option set status = 0
+		update su_ques_option set status = 0 
 		where ques_id = #{quesId} and 0 = (
-		select count(*) from su_paper_ques pq
-		left join su_paper p on pq.paper_id = p.paper_id
+		select count(*) from su_paper_ques pq 
+		left join su_paper p on pq.paper_id = p.paper_id 
 		where p.status != 0 and pq.ques_id = #{quesId})
 	</update>
 </mapper>

@@ -8,6 +8,12 @@ import org.apache.ibatis.annotations.Select;
 
 import com.dave.entity.PaperQuesOption;
 
+/**
+ * PaperQuesOption持久层接口
+ * 
+ * @author Dave20190918
+ *
+ */
 public interface PaperQuesOptionDao {
 	
 	int addPaperQuesOption(PaperQuesOption paperQuesOption);

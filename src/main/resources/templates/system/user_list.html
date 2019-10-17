@@ -1,0 +1,179 @@
+<div class="row">
+  <div class="col-xs-12">
+    <div class="box">
+	  <div class="box-header">
+	    <h3 class="box-title">用户管理</h3>
+	    <div class="box-tools">
+		  <div class="input-group input-group-sm" style="width: 300px;">
+		    <input type="text" name="table_search" id="searchNameId"
+				  class="form-control pull-right" placeholder="请输入用户名或员工号">
+			<div class="input-group-btn">
+			  <button type="button" class="btn btn-default btn-search">
+                <i class="fa fa-search"></i>
+			  </button>
+			  <button type="button" class="btn btn-default btn-add">添加</button>
+			</div>
+		  </div>
+	    </div>
+	  </div>
+	  <!-- /.box-header -->
+	  <div class="box-body table-responsive no-padding">
+	    <table class="table table-hover text-center">
+	      <thead>
+		    <tr>
+		      <th style="width:5%;">No.</th>
+			  <th>用户名</th>
+			  <th>真实名</th>
+			  <th>角色</th>
+			  <th>员工号</th>
+			  <th>创建用户</th>
+			  <th>修改用户</th>
+			  <th>操作</th>
+		    </tr>
+		  </thead>
+		  <tbody id="tbodyId"></tbody>
+	    </table>
+	  </div>
+	  <!-- /.box-body -->
+	  <div id="pageId" class="box-footer clearfix"></div>
+    </div>
+    <!-- /.box -->
+  </div>
+  <!-- /.col -->
+</div>
+<!-- /.row -->
+<script type="text/javascript">
+$(function(){
+	$("#pageId").load("doPageUI", function(){
+		doGetObjects();
+	});
+	$(".input-group-btn")
+		.on("click",".btn-add", doLoadEditUI)
+		.on("click",".btn-search", doQueryUser);
+	$("#tbodyId")
+  		.on("click", ".btn-update", doLoadEditUI)
+  		.on("click", ".btn-delete", doDeleteUser);
+});
+//查询用户
+function doQueryUser(){
+	$("#pageId").data("pageCurrent", 1);
+	doGetObjects();
+}
+//获取页面数据
+function doGetObjects(){
+	var url = "user/doFindUserList";
+	var pageCurrent = $("#pageId").data("pageCurrent");
+	if(!pageCurrent){
+		pageCurrent = 1;
+		$("#pageId").data("pageCurrent", 1);
+	}
+	var params = {"pageCurrent" : pageCurrent}
+	var searchValue = $("#searchNameId").val().trim();
+	var reg = /^\d+$/;
+	if(reg.test(searchValue) == true){
+		params.staffId = searchValue;
+	}else{
+		params.username = searchValue;
+	}
+	$.getJSON(url, params, function(result){
+		doHandleResponseResult(result);
+	});
+}
+//处理响应结果
+function doHandleResponseResult(result){
+	if(result.state == 1){
+		doSetTableBodyRows(result.data.records);
+		autoAddNumber();//自增序列号
+	}
+}
+function doSetTableBodyRows(data){
+	var tBody = $("#tbodyId");
+	tBody.empty();
+	if(data.length > 0){
+		for(var i in data){
+			var tr = $("<tr></tr>");
+			tr.data("userId", data[i].userId);
+			var tds = doCreateTds(data[i]);
+			tr.append(tds);
+			tBody.append(tr);
+		}
+	}
+}
+function doCreateTds(row){
+	var tds = 
+		"<td><span class='numberClass'></span></td>"+
+		"<td>"+row.username+"</td>"+
+		"<td>"+row.realName+"</td>"+
+		"<td>"+row.roleName+"</td>"+
+	    "<td>"+row.staffId+"</td>"+
+	    "<td>"+row.createUser+"</td>"+
+	    "<td>"+row.modifyUser+"</td>"+
+	    "<td>"+
+			"<input type='button' class='btn-delete' value='删除'>"+
+			"&nbsp;&nbsp;"+
+			"<input type='button' class='btn-update' value='修改'>"+
+		"</td>";
+    return tds;
+}
+//页面数据自增序列号
+function autoAddNumber(){
+    var pageCurrent = $("#pageId").data("pageCurrent");
+    var pageNo = (pageCurrent-1) * 10;
+	function number(){
+	    var index = 0;
+    	for(var i = 0+pageNo;i < $(".numberClass").length+pageNo; i++){
+			$(".numberClass").get(index).innerHTML = i+1;
+			index++;
+    	}
+	}
+	number();
+}
+//=====================================
+//添加和修改用户
+function doLoadEditUI(){
+	var title;
+	if($(this).hasClass("btn-add")){
+		title = "添加用户";
+		doLoadPage(title);
+	}else if($(this).hasClass("btn-update")){
+		title = "修改用户";
+		var userId = $(this).parents("tr").data("userId");
+		doFindObjectById(userId, title);
+	}
+}
+function doFindObjectById(userId, title){
+	var params = {"userId" : userId};
+	var url="user/doFindUserById";
+	$.getJSON(url, params, function(result){
+		if(result.state == 1){
+			$("#mainContentId").data("rowData", result.data); 
+	        doLoadPage(title);
+		}else{
+			alert(result.message);
+		}
+	});
+}
+function doLoadPage(title){
+	var url="user/doUserEditUI"
+	$("#mainContentId").load(url,function(){
+		$(".box-title").html(title);
+	}) 
+}
+//==========================================
+//删除用户
+function doDeleteUser(){
+	if(window.confirm("您确定要删除吗？")){
+		var userId = $(this).parents("tr").data("userId");
+		var params = {"userId" : userId};
+		var url="user/doDeleteUser";
+		$.getJSON(url, params, function(result){
+			if(result.state == 1){
+				doGetObjects();
+				alert(result.message);
+			}else{
+				alert(result.message);
+			}
+		});
+	}
+}
+</script>

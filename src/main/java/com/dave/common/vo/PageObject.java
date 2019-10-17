@@ -4,11 +4,11 @@ import java.io.Serializable;
 import java.util.List;
 
 /**
- * 分页处理类
+ * Page值对象
  * 
  * @author Dave20190826
- *
  * @param <T>
+ * 
  */
 public class PageObject<T> implements Serializable{
     private static final long serialVersionUID = 6780580291247550747L;

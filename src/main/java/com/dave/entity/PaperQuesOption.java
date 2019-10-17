@@ -1,11 +1,15 @@
 package com.dave.entity;
+
+import java.io.Serializable;
+
 /**
  * 问卷问题选项PO
  * 
  * @author Dave20190918
  *
  */
-public class PaperQuesOption {
+public class PaperQuesOption implements Serializable{
+	private static final long serialVersionUID = -9171298449617934280L;
 	/**问卷问题选项ID*/
 	private Integer paperQuesOptionId;
 	/**问卷ID*/

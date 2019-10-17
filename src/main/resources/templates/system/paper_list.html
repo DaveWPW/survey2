@@ -23,7 +23,7 @@
 	    <table class="table table-hover text-center">
 	      <thead>
 		    <tr>
-		      <th><input type="checkbox" id="checkAllId">全选</th>
+		      <th style="text-align:left;"><input type="checkbox" id="checkAllId">全选</th>
 			  <th>问卷名称</th>
 			  <th>问卷类型</th>
 			  <th>问卷语言</th>
@@ -130,12 +130,12 @@ function doCreateTds(data){
 		language = "中文";
 	}
 	var tds=
-		"<td><input type='checkbox' name='paperId' class='paperId' value='"+data.paperId+"'><span class='numberClass'></span></td>"+
+		"<td style='text-align:left;'><input type='checkbox' name='paperId' class='paperId' value='"+data.paperId+"'><span class='numberClass'></span></td>"+
 	    "<td><input type='button' style='width:300px;' value='"+data.paperName+"' onclick='doGetPaperQues("+data.paperId+")'></td>"+
 	    "<td>"+type+"</td>"+
 	    "<td>"+language+"</td>"+
 	    "<td>"+showStatus+"：<input type='button' value='"+status+"' class='btn-status'></td>"+
-	    "<td>"+data.createTime+"</td>"+
+	    "<td>"+new Date(data.createTime).toLocaleString()+"</td>"+
 	    "<td><input type='button' class='btn-test' value='测试'></td>";
     return tds;
 }
