@@ -131,7 +131,7 @@ public class UserController {
     	if(admin.equals(user.getUsername()) && user.getIsRestPassword() == 0) {
     		return new JsonResult("禁止修改admin用户！！");
     	}
-    	if(admin.equals(user.getUsername()) && user.getRoleId() != 2) {
+    	if(admin.equals(user.getUsername()) && user.getRoleId() != 1) {
     		return new JsonResult("禁止修改admin用户！！");
     	}
     	if(StringUtils.isEmpty(user.getUserId())) {

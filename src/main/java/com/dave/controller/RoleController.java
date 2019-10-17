@@ -149,7 +149,7 @@ public class RoleController {
     	if(StringUtils.isEmpty(roleId)) {
     		return new JsonResult("角色ID不能为空");
     	}
-    	if(roleId == 2) {
+    	if(roleId == 1) {
     		return new JsonResult("禁止删除admin角色！！");
     	}
 		String info = roleService.deleteRole(roleId);

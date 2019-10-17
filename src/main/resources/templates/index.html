@@ -16,18 +16,17 @@
   <link rel="stylesheet" href="bower_components/treegrid/jquery.treegrid.css"/>
 </head>
 <body class="hold-transition skin-blue sidebar-mini">
-<input id="level" type="hidden" th:value="${level}"/>
 <div class="wrapper">
   <header class="main-header">
   	<div>
   		<span style="color:white; margin:10px 0px 15px 5px; font-size:26px;" >Survey Syetem</span>
 	  	<div style="float:right; width:30%; color:white;">
 		    <span>Username:&nbsp;</span>
-		    <span id="username"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+		    <span id="usernameInfo"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 			<span>Staff&nbsp;ID:&nbsp;</span>
-			<span id="staffId"></span>&nbsp;&nbsp;&nbsp;&nbsp;
+			<span id="staffIdInfo"></span>&nbsp;&nbsp;&nbsp;&nbsp;
 			<span>Role:&nbsp;</span>
-			<span id="roleName"></span>
+			<span id="roleNameInfo"></span>
 	  	</div>
   	</div>
   </header>
@@ -61,7 +60,7 @@
           </ul>
         </li>
         <li><a onclick="doUpdatePassword()"><i class="fa fa-link"></i>修改密码</a></li>
-        <li><a href="doLogout"><i class="fa fa-link"></i>退出登录</a></li>
+        <li><a onclick="doLogout()"><i class="fa fa-link"></i>退出登录</a></li>
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -96,9 +95,9 @@ function doShowPageUI(){
     var url = "doShowUI";
     $.post(url, function(result){
         if(result.state == 1){
-            $("#username").html(result.data.username);
-            $("#staffId").html(result.data.staffId);
-            $("#roleName").html(result.data.roleName);
+            $("#usernameInfo").html(result.data.username);
+            $("#staffIdInfo").html(result.data.staffId);
+            $("#roleNameInfo").html(result.data.roleName);
             var level = result.data.level;
             for(var i = 0; i < level.length; i++){
                 var id = level[i];
@@ -118,6 +117,10 @@ function doUpdatePassword(){
 	$("#mainContentId").load("doUpdatePasswordUI", function(){
     	$("#mainContentId").removeData();
     });
+}
+function doLogout() {
+    $("#mainContentId").removeData();
+    location.href="doLogout";
 }
 //console.log();
 //alert();
