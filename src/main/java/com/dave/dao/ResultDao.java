@@ -34,5 +34,8 @@ public interface ResultDao {
 	List<ResultExportInfo> exportResult(
             @Param("paperName") String paperName, @Param("startDate") String startDate,
             @Param("endDate") String endDate);
-	
+
+	@Select("select count(*) from su_result where mobile_num = #{mobile} and paper_name = #{paperName}")
+	int findIfRepeatAnswer(@Param("mobile")String mobile, @Param("paperName")String paperName);
+
 }

@@ -38,6 +38,12 @@ public class SurveyServiceImpl implements SurveyService{
 	private ResultDao resultDao;
 	@Autowired
 	private ResultQuesDao resultQuesDao;
+
+	@Override
+	public int findIfRepeatAnswer(String mobile, String paperName) {
+		return resultDao.findIfRepeatAnswer(mobile, paperName);
+	}
+
 	@Override
 	public PaperInfo findStartPaper(String paperName, String paperLanguage) {
 		Paper paper = paperDao.findStartPaper(paperName, paperLanguage);

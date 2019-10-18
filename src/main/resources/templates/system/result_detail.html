@@ -17,13 +17,13 @@
 	  </div>
 	  <!-- /.box-header -->
 	  <div class="box-body table-responsive no-padding">
-	    <table class="table table-hover">
+	    <table class="table table-hover text-center">
 	      <thead>
 		    <tr>
-			  <th>序号</th>
-			  <th>类型</th>
-			  <th>题目</th>
-			  <th>答案</th>
+			  <th style="width:5%;">序号</th>
+			  <th style="width:15%;">类型</th>
+			  <th style="width:50%;">题目</th>
+			  <th style="width:30%;">答案</th>
 		    </tr>
 		  </thead>
 		  <tbody id="tbodyId"></tbody>
@@ -77,7 +77,7 @@ function doCreateTds(data){
 	var tds=
 		"<td>"+data.quesNum+"</td>"+
 	    "<td>"+type+"</td>"+
-	    "<td>"+data.quesName+"</td>"+
+	    "<td style='text-align:left;'>"+data.quesName+"</td>"+
 	    "<td>"+data.optionContent+"</td>";
     return tds;
 }

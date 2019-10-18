@@ -129,15 +129,15 @@ function doCreateTds(data){
 	}else if(data.paperLanguage === "ch"){
 		language = "中文";
 	}
-	var tds=
+	var tds =
 		"<td style='text-align:left;'><input type='checkbox' name='paperId' class='paperId' value='"+data.paperId+"'><span class='numberClass'></span></td>"+
-	    "<td><input type='button' style='width:300px;' value='"+data.paperName+"' onclick='doGetPaperQues("+data.paperId+")'></td>"+
-	    "<td>"+type+"</td>"+
-	    "<td>"+language+"</td>"+
-	    "<td>"+showStatus+"：<input type='button' value='"+status+"' class='btn-status'></td>"+
-	    "<td>"+new Date(data.createTime).toLocaleString()+"</td>"+
-	    "<td><input type='button' class='btn-test' value='测试'></td>";
-    return tds;
+		"<td style='width:300px;'><a onclick='doGetPaperQues("+data.paperId+")'>"+data.paperName+"</a></td>"+
+		"<td>"+type+"</td>"+
+		"<td>"+language+"</td>"+
+		"<td>"+showStatus+"：<a class='btn-status'>"+status+"</a></td>"+
+		"<td>"+new Date(data.createTime).toLocaleString()+"</td>"+
+		"<td><a class='btn-test'>测试</a></td>";
+	return tds;
 }
 //页面数据自增序列号
 function autoAddNumber(){
@@ -239,7 +239,7 @@ function doUpdateStatus(){
 	var paperId = $(this).parents('tr').find("td").eq(0).find("input").val();
 	var type = $(this).parents('tr').find("td").eq(2).text();
 	var language = $(this).parents('tr').find("td").eq(3).text();
-	var status = $(this).val();
+	var status = $(this).html();
 	var paperType;
 	if(type === "单张"){
 		paperType = "01";
@@ -286,7 +286,7 @@ function doTestPaper(){
 	dateStr = year.toString() + (month>9?month:'0'+month) + (day>9?day:'0'+day) + hours + minute + second;
 	
 	var language = $(this).parents("tr").find("td").eq(3).html();
-	var paperName = $(this).parents("tr").find("td").eq(1).find("input").eq(0).val();
+	var paperName = $(this).parents("tr").find("td").eq(1).find("a").html();
 	var paperLanguage;
 	if(language === "英文"){
 		paperLanguage = "eng";

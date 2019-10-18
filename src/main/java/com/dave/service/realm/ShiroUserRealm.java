@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authc.credential.CredentialsMatcher;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
@@ -17,7 +18,9 @@ import org.springframework.util.StringUtils;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * Realm实现类
@@ -31,12 +34,16 @@ public class ShiroUserRealm extends AuthorizingRealm {
 	private UserDao userDao;
 	@Autowired
 	private MenuDao menuDao;
+
+	private Map<String, SimpleAuthorizationInfo> cacheMap = new ConcurrentHashMap<>();
+
 	@Override
 	public void setCredentialsMatcher(CredentialsMatcher credentialsMatcher) {
 		HashedCredentialsMatcher cMatcher = new HashedCredentialsMatcher();
 		cMatcher.setHashAlgorithmName("MD5");
 		super.setCredentialsMatcher(cMatcher);
 	}
+
 	@Override
 	protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
 			throws AuthenticationException {
@@ -49,15 +56,22 @@ public class ShiroUserRealm extends AuthorizingRealm {
 		ByteSource credentialsSalt = ByteSource.Util.bytes(user.getPasswordSalt());
 		SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
 				user, user.getPassword(), credentialsSalt, getName());
+		if(cacheMap.containsKey(username)) {
+			cacheMap.remove(username);
+		}
 		return info;
 	}
+
 	@Override
 	protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
 		User user = (User)principals.getPrimaryPrincipal();
+		if(cacheMap.containsKey(user.getUsername())) {
+			return cacheMap.get(user.getUsername());
+		}
 		List<String> level = menuDao.findRoleMenuLevelById(user.getRoleId());
 		if(level == null || level.size() == 0) {
-			logger.info("用户角色不存在菜单权限");
-			return null;
+			logger.info("该角色不存在任何菜单权限");
+			throw new AuthorizationException();
 		}
 		Set<String> permissionSet = new HashSet<>();
 		for(String permission : level){
@@ -67,6 +81,8 @@ public class ShiroUserRealm extends AuthorizingRealm {
 		}
 		SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 		info.setStringPermissions(permissionSet);
+		cacheMap.put(user.getUsername(), info);
 		return info;
 	}
+
 }

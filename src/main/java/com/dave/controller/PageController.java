@@ -52,31 +52,56 @@ public class PageController {
 	public String doPageUI(){
 		return "common/page";
 	}
-	
+
+	/**
+	 * 修改用户密码页面
+	 *
+	 * @return system/update_password
+	 */
+	@RequestMapping("doUpdatePasswordUI")
+	public String doUpdatePasswordUI() {
+		return "system/update_password";
+	}
+
+	/**
+	 * Hotline使用的调查问卷接口
+	 *
+	 * @param model
+	 * @param mobile
+	 * @param language
+	 * @param cli
+	 * @param agentId
+	 * @param inviteTime
+	 * @param paperName
+	 * @return
+	 */
 	@RequestMapping("doSurveyUI")
-	public String doSurveyUI(Model model, 
-			long mobile, String language, long cli, int agentId, String inviteTime, String paperName) {
+	public String doSurveyUI(Model model,
+							 String mobile, String language, String cli, String agentId, String inviteTime, String paperName) {
 		try {
 			System.out.println("/survey/doSurveyUI.do?mobile="+mobile+"&language="+language+"&cli="+cli+"&agentId="+agentId+"&inviteTime="+inviteTime+"&paperName="+paperName);
 			SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyyMMddHHmmss");
 			long userDate = simpleDateFormat.parse(inviteTime).getTime();
 			long nowDate = System.currentTimeMillis();
 			long dayTimeMillis = 7*24*3600*1000;
-			if(dayTimeMillis > nowDate-userDate) {
-				PaperInfo paperInfo = surveyService.findStartPaper(paperName, language);
-				if(!(paperInfo == null || StringUtils.isEmpty(paperInfo))) {
-					model.addAttribute("language", language);
-					model.addAttribute("paperName", paperName);
-					model.addAttribute("mobile", mobile);
-					model.addAttribute("cli", cli);
-					model.addAttribute("agentId", agentId);
-					model.addAttribute("inviteTime", inviteTime);
-					if("01".equals(paperInfo.getPaperType())) {
-						return "survey01";
-					}else if("02".equals(paperInfo.getPaperType())) {
-						return "survey02";
+			if(dayTimeMillis > nowDate - userDate) {
+				int count = surveyService.findIfRepeatAnswer(mobile, paperName);
+				if(count == 0) {
+					PaperInfo paperInfo = surveyService.findStartPaper(paperName, language);
+					if(!(paperInfo == null || StringUtils.isEmpty(paperInfo))) {
+						model.addAttribute("language", language);
+						model.addAttribute("paperName", paperName);
+						model.addAttribute("mobile", mobile);
+						model.addAttribute("cli", cli);
+						model.addAttribute("agentId", agentId);
+						model.addAttribute("inviteTime", inviteTime);
+						if("01".equals(paperInfo.getPaperType())) {
+							return "survey01";
+						}else if("02".equals(paperInfo.getPaperType())) {
+							return "survey02";
+						}
 					}
-				}			
+				}
 			}
 		} catch (ParseException e) {
 			e.printStackTrace();
@@ -85,16 +110,6 @@ public class PageController {
 		model.addAttribute("chMessage", "抱歉，此連結已經無效！");
 		model.addAttribute("engMessage", "Sorry , this link is no longer valid!");
 		return "paper404";
-	}
-	
-	/**
-	 * 修改用户密码页面
-	 * 
-	 * @return system/update_password
-	 */
-	@RequestMapping("doUpdatePasswordUI")
-	public String doUpdatePasswordUI() {
-		return "system/update_password";
 	}
 	
 }

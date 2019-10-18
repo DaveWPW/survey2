@@ -10,7 +10,9 @@ import com.dave.entity.vo.ResultInfo;
  *
  */
 public interface SurveyService {
-	
+
+	int findIfRepeatAnswer(String mobile, String paperName);
+
 	PaperInfo findStartPaper(String paperName, String paperLanguage);
 	
 	int submitSurveyResult(ResultInfo resultInfo);

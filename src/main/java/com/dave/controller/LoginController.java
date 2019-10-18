@@ -5,6 +5,7 @@ import com.dave.common.vo.JsonResult;
 import com.dave.entity.User;
 import com.dave.service.MenuService;
 import com.dave.service.UserService;
+import org.apache.log4j.Logger;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
@@ -18,6 +19,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +33,7 @@ import java.util.Map;
 @Controller
 @RequestMapping("/")
 public class LoginController {
+	private static Logger logger = Logger.getLogger(LoginController.class);
 	@Autowired
 	private UserService userService;
 	@Autowired
@@ -55,6 +58,7 @@ public class LoginController {
 		Subject currentUser = SecurityUtils.getSubject();
 		try {
 			currentUser.login(token);
+			logger.info(username+" 登录成功！！"+new Date());
 			return new JsonResult("Login Succeed!", 1);
 		} catch (UnknownAccountException e) {
 			return new JsonResult("此用户不存在");
@@ -63,6 +67,7 @@ public class LoginController {
 		} catch (AuthenticationException e) {
 			return new JsonResult("用户名密码错误");
 		} catch (RuntimeException e) {
+			logger.info("未知错误，请联系管理员");
 			return new JsonResult("未知错误，请联系管理员");
 		}
 	}
@@ -101,6 +106,11 @@ public class LoginController {
 		return new JsonResult("Update Failed!!");
     }
 
+	/**
+	 * 获取页面显示级别标识
+	 *
+	 * @return
+	 */
 	@RequestMapping("doShowUI")
 	@ResponseBody
     private JsonResult doShowUI(){

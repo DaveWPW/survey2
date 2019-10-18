@@ -26,7 +26,7 @@
 				 <th>备注</th>
 				 <th>创建用户</th>
 				 <th>修改用户</th>
-				 <th>操作</th>
+				 <th style="width:120px;">操作</th>
 			  </tr>
 			</thead>
 		    <tbody id="tbodyId"></tbody>
@@ -118,11 +118,7 @@ function doCreateTds(row){
 		"<td>"+row.roleNote+"</td>"+
 		"<td>"+row.createUser+"</td>"+
 		"<td>"+row.modifyUser+"</td>"+
-		"<td>"+
-			"<input type='button' class='btn-delete' value='删除'>"+
-			"&nbsp;&nbsp;"+
-			"<input type='button' class='btn-update' value='修改'>"+
-		"</td>";
+		"<td><a class='btn-delete'>Delete&nbsp;|&nbsp;<a class='btn-update'>Update</a></td>";
 	return tds;
 }
 //页面数据自增序列号

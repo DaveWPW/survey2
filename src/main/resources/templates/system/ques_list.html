@@ -121,7 +121,7 @@ function doCreateTds(data){
 	var tds=
 		"<td style='text-align:left;'><input type='checkbox' name='quesId' class='quesId' value='"+data.quesId+"'><span class='numberClass'></span></td>"+
 		"<td>"+data.quesId+"</td>"+
-		"<td><input type='submit' style='width:500px;' value='"+data.quesName+"' onclick='doGetQuesOption("+data.quesId+")'></td>"+
+			"<td style='width:500px; text-align:left;'><a onclick='doGetQuesOption("+data.quesId+")'>"+data.quesName+"</a></td>"+
 	    "<td>"+type+"</td>"+
 	    "<td>"+new Date(data.createTime).toLocaleString()+"</td>";
     return tds;
