@@ -34,7 +34,7 @@ public interface RoleDao {
 	
 	int updateRole(Role role);
 	
-	@Select("select username from su_uesr where status = 1 and role_id = #{roleId}")
+	@Select("select username from su_user where status = 1 and role_id = #{roleId}")
 	List<String> findRoleUse(@Param("roleId") int roleId);
 	
 	@Delete("delete from su_role where role_id = #{roleId}")

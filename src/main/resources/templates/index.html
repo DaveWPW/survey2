@@ -60,7 +60,7 @@
           </ul>
         </li>
         <li><a onclick="doUpdatePassword()"><i class="fa fa-link"></i>修改密码</a></li>
-        <li><a onclick="doLogout()"><i class="fa fa-link"></i>退出登录</a></li>
+        <li><a href="doLogout"><i class="fa fa-link"></i>退出登录</a></li>
       </ul>
       <!-- /.sidebar-menu -->
     </section>
@@ -117,10 +117,6 @@ function doUpdatePassword(){
 	$("#mainContentId").load("doUpdatePasswordUI", function(){
     	$("#mainContentId").removeData();
     });
-}
-function doLogout() {
-    $("#mainContentId").removeData();
-    location.href="doLogout";
 }
 //console.log();
 //alert();

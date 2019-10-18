@@ -153,11 +153,11 @@ public class RoleController {
     		return new JsonResult("禁止删除admin角色！！");
     	}
 		String info = roleService.deleteRole(roleId);
-		if(info == null) {
+		if(info != null) {
 			if("Delete Failed!!".equals(info)) {
 				return new JsonResult(info);
 			} else {
-				return new JsonResult("这个角色也给"+info+"这些用户, 拒绝删除！");
+				return new JsonResult(info+"已使用该角色, 拒绝删除！");
 			}
 		}
 		return new JsonResult("Delete Succeed!", 1);

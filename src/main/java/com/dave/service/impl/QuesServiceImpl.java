@@ -84,7 +84,7 @@ public class QuesServiceImpl implements QuesService {
 		if(paperNameList.size() == 0 || paperNameList == null) {
 		} else {
 			List<String> quesIdList = quesDao.findUseQuesIdByQuesIds(quesIds);
-			return paperNameList.toString()+"调查问卷正在使用"+quesIdList.toString()+"编号的问题，拒绝删除"+quesIdList.toString()+"编号的问题！！";		
+			return paperNameList.toString()+"调查问卷正在使用"+quesIdList.toString()+"编号的问题，拒绝删除正在使用的问题！！";
 		}
 		return null;
 	}
