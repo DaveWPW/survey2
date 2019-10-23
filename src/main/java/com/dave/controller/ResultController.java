@@ -39,7 +39,7 @@ public class ResultController {
 	 * 
 	 * @return system/result_list
 	 */
-	@RequiresPermissions("S4")
+	@RequiresPermissions("result")
     @RequestMapping("doResultListUI")
 	public String doQuesListUI() {
 		return "system/result_list";

@@ -59,7 +59,7 @@
             </span>
           </a>
           <ul class="treeview-menu">
-         	<li id="S1" style="display: none;" class="treeview">
+         	<li id="advanced-id" style="display: none;" class="treeview">
          		<a href="#">
          			<span>用户高级管理</span>
             		<span class="pull-right-container">
@@ -67,20 +67,20 @@
             		</span>
           		</a>
           		<ul class="treeview-menu">
-          			<li id="S5" style="display: none;"><a id="load-user-id">用户管理</a></li>
-            		<li id="S6" style="display: none;"><a id="load-role-id">角色管理</a></li>
+          			<li id="user-id" style="display: none;"><a id="load-user-id">用户管理</a></li>
+            		<li id="role-id" style="display: none;"><a id="load-role-id">角色管理</a></li>
           		</ul>
          	</li>
-            <li id="S2" style="display: none;"><a id="load-ques-id">调查问题管理</a></li>
-            <li id="S3" style="display: none;"><a id="load-paper-id">调查问卷管理</a></li>
-            <li id="S4" style="display: none;"><a id="load-result-id">调查结果管理</a></li>
+            <li id="ques-id" style="display: none;"><a id="load-ques-id">调查问题管理</a></li>
+            <li id="paper-id" style="display: none;"><a id="load-paper-id">调查问卷管理</a></li>
+            <li id="result-id" style="display: none;"><a id="load-result-id">调查结果管理</a></li>
           </ul>
         </li>
         <li>
           <a onclick="doUpdatePassword()"><i class="fa fa-gear"></i><span>修改密码</span></a>
         </li>
         <li>
-          <a href="doLogout"><i class="fa fa-remove"></i><span>退出登录</span></a>
+          <a href="doLogout"><i class="fa fa-arrow-left"></i><span>退出登录</span></a>
         </li>
       </ul>
       <!-- /.sidebar-menu -->
@@ -119,10 +119,9 @@ function doShowPageUI(){
             $("#usernameInfo").html(result.data.username);
             $("#staffIdInfo").html(result.data.staffId);
             $("#roleNameInfo").html(result.data.roleName);
-            var level = result.data.level;
-            for(var i = 0; i < level.length; i++){
-                var id = level[i];
-                $("#"+id).show();
+            var permission = result.data.permission;
+            for(var i = 0; i < permission.length; i++){
+                $("#"+permission[i]+"-id").show();
             }
         }
     });

@@ -31,7 +31,7 @@ public class RoleController {
 	 * 
 	 * @return system/role_list
 	 */
-	@RequiresPermissions(value = {"S1", "S6"})
+	@RequiresPermissions(value = {"advanced", "role"})
 	@RequestMapping("doRoleListUI")
 	public String doRoleListUI() {
 		return "system/role_list";

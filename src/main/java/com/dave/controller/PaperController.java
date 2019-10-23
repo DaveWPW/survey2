@@ -34,7 +34,7 @@ public class PaperController {
 	 * 
 	 * @return system/paper_list
 	 */
-	@RequiresPermissions("S3")
+	@RequiresPermissions("paper")
     @RequestMapping("doPaperListUI")
 	public String doPaperListUI(){
 		return "system/paper_list";

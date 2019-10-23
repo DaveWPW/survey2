@@ -68,13 +68,13 @@ public class ShiroUserRealm extends AuthorizingRealm {
 		if(cacheMap.containsKey(user.getUsername())) {
 			return cacheMap.get(user.getUsername());
 		}
-		List<String> level = menuDao.findRoleMenuLevelById(user.getRoleId());
-		if(level == null || level.size() == 0) {
+		List<String> permissions = menuDao.findRoleMenuLevelById(user.getRoleId());
+		if(permissions == null || permissions.size() == 0) {
 			logger.info("该角色不存在任何菜单权限");
 			throw new AuthorizationException();
 		}
 		Set<String> permissionSet = new HashSet<>();
-		for(String permission : level){
+		for(String permission : permissions){
 			if(!StringUtils.isEmpty(permission)){
 				permissionSet.add(permission);
 			}

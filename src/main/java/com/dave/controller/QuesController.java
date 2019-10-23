@@ -34,7 +34,7 @@ public class QuesController {
 	 * 
 	 * @return system/ques_list
 	 */
-	@RequiresPermissions("S2")
+	@RequiresPermissions("ques")
     @RequestMapping("doQuesListUI")
 	public String doQuesListUI(){
 		return "system/ques_list";

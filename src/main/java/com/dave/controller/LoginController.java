@@ -115,9 +115,9 @@ public class LoginController {
 	@ResponseBody
     private JsonResult doShowUI(){
 		User currentUser = ShiroUtil.getCurrentUser();
-		List<String> level = menuService.findRoleMenuLevelById(currentUser.getRoleId());
+		List<String> permission = menuService.findRoleMenuLevelById(currentUser.getRoleId());
 		Map<String, Object> map = new HashMap<>();
-		map.put("level", level);
+		map.put("permission", permission);
 		map.put("username", currentUser.getUsername());
 		map.put("staffId", currentUser.getStaffId());
 		map.put("roleName", currentUser.getRoleName());

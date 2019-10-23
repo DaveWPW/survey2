@@ -30,7 +30,7 @@ public class UserController {
 	 * 
 	 * @return system/user_list
 	 */
-	@RequiresPermissions(value = {"S1", "S5"})
+	@RequiresPermissions(value = {"advanced", "user"})
     @RequestMapping("doUserListUI")
 	public String doUserListUI(){
 		return "system/user_list";
