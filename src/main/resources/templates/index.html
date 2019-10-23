@@ -10,12 +10,14 @@
   <link rel="stylesheet" href="bower_components/font-awesome/css/font-awesome.min.css">
   <link rel="stylesheet" href="bower_components/Ionicons/css/ionicons.min.css">
   <link rel="stylesheet" href="dist/css/AdminLTE.min.css">
-  <link rel="stylesheet" href="dist/css/skins/skin-blue.min.css">
+  <!--<link rel="stylesheet" href="dist/css/skins/skin-blue.min.css">-->
+  <link rel="stylesheet" href="dist/css/skins/skin-black.min.css">
   <link rel="stylesheet" href="bower_components/layer/skin/default/layer.css">
   <link rel="stylesheet" href="bower_components/ztree/css/metroStyle/metroStyle.css"/>
   <link rel="stylesheet" href="bower_components/treegrid/jquery.treegrid.css"/>
 </head>
-<body class="hold-transition skin-blue sidebar-mini">
+<!--<body class="hold-transition skin-blue sidebar-mini">-->
+<body class="hold-transition skin-black sidebar-mini">
 <div class="wrapper">
   <header class="main-header">
       <!-- Logo -->
@@ -32,9 +34,11 @@
               <ul class="nav navbar-nav">
                   <li class="dropdown user user-menu">
                       <a href="#" class="dropdown-toggle" data-toggle="dropdown">
-                          <span class="hidden-xs">Username: <span id="usernameInfo"/>   </span>
-                          <span class="hidden-xs">Staff ID: <span id="staffIdInfo"/>   </span>
-                          <span class="hidden-xs">Role: <span id="roleNameInfo"/>   </span>
+                          <span class="hidden-xs">
+                              <span>Username: <span id="usernameInfo"/></span>
+                              <span>Staff ID: <span id="staffIdInfo"/></span>
+                              <span>Role: <span id="roleNameInfo"/></span>
+                          </span>
                       </a>
                   </li>
               </ul>
@@ -72,11 +76,11 @@
             <li id="S4" style="display: none;"><a id="load-result-id">调查结果管理</a></li>
           </ul>
         </li>
-        <li class="treeview">
-          <a onclick="doUpdatePassword()"><i class="fa fa-link"></i><span>修改密码</span></a>
+        <li>
+          <a onclick="doUpdatePassword()"><i class="fa fa-gear"></i><span>修改密码</span></a>
         </li>
         <li>
-          <a href="doLogout"><i class="fa fa-link"></i><span>退出登录</span></a>
+          <a href="doLogout"><i class="fa fa-remove"></i><span>退出登录</span></a>
         </li>
       </ul>
       <!-- /.sidebar-menu -->

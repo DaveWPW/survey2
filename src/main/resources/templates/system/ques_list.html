@@ -1,29 +1,16 @@
 <div class="row">
   <div class="col-xs-12">
     <div class="box">
-	  <div class="box-header">
-	    <h3 class="box-title">调查问题管理</h3>
-	    <div class="box-tools">
-		  <div style="float:right; border:2px solid #DDDDDD;">
-		    <form id="form_table" method="post" enctype="multipart/form-data">
-		      <input style="width:175px;" id="file_excel" type="file" name="filename"accept=".xls,.xlsx"></input>
-		    </form>
+	  <div class="box-header no-margin">
+		  <h3 class="box-title">调查问题管理</h3>
+		  <div class="box-button" style="float:right; border:2px solid #0088A8;">
+			  <input type="text" name="table_search" id="searchNameId" placeholder="请输入问题名称"><button type="button" class="btn-search"><i class="fa fa-search"></i></button> <button type="button" class="btn-delete">删除</button><button type="button" class="btn-import">导入</button><button type="button" class="btn-add-single">添加单选题</button><button type="button" class="btn-add-multiple">添加多选题</button><button type="button" class="btn-add-easy">添加简答题</button>
+			  <div style="float:right; width:180px;">
+				  <form id="form_table" method="post" enctype="multipart/form-data">
+					  <input id="file_excel" type="file" name="filename"accept=".xls,.xlsx"></input>
+				  </form>
+			  </div>
 		  </div>
-		  <div class="input-group input-group-sm" style="width:450px; margin-right:190px;">
-		    <input type="text" name="table_search" id="searchNameId"
-				  class="form-control pull-right" placeholder="请输入问题名称">
-			<div class="input-group-btn">
-			  <button type="button" class="btn btn-default btn-search">
-                <i class="fa fa-search"></i>
-			  </button>
-			  <button type="button" class="btn btn-default btn-add-single">添加单选题</button>
-			  <button type="button" class="btn btn-default btn-add-multiple">添加多选题</button>
-			  <button type="button" class="btn btn-default btn-add-easy">添加简答题</button>
-			  <button type="button" class="btn btn-default btn-import">导入</button>
-			  <button type="button" class="btn btn-default btn-delete">删除</button>
-			</div>
-		  </div>
-	    </div>
 	  </div>
 	  <!-- /.box-header -->
 	  <div class="box-body table-responsive no-padding">
@@ -57,7 +44,7 @@ $(function(){
 	});
 	$("#checkAllId").change(doChangeTBodyCheckBoxState);
 	$("#tbodyId").on("change", ".quesId", doChangeTHeadCheckBoxState);
-	$(".input-group-btn")
+	$(".box-button")
 		.on("click",".btn-search", doQueryObjects)
 		.on("click",".btn-add-single,.btn-add-multiple,.btn-add-easy", doLoadEditUI)
 		.on("click",".btn-delete", doDeleteQues)

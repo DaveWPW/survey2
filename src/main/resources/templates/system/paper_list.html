@@ -3,20 +3,9 @@
     <div class="box">
 	  <div class="box-header">
 	    <h3 class="box-title">调查问卷管理</h3>
-	    <div class="box-tools">
-		  <div class="input-group input-group-sm" style="width: 450px;">
-		    <input type="text" name="table_search" id="searchNameId"
-				  class="form-control pull-right" placeholder="请输入问卷名称">
-			<div class="input-group-btn">
-			  <button type="button" class="btn btn-default btn-search">
-                <i class="fa fa-search"></i>
-			  </button>
-			  <button type="button" class="btn btn-default btn-create-only">创建单张问卷</button>
-			  <button type="button" class="btn btn-default btn-create-branch">创建分支问卷</button>
-			  <button type="button" class="btn btn-default btn-delete">删除</button>
-			</div>
-		  </div>
-	    </div>
+		<div class="box-button" style="float:right; border:2px solid #0088A8;">
+			<input type="text" name="table_search" id="searchNameId" placeholder="请输入问卷名称"><button type="button" class="btn-search"><i class="fa fa-search"></i></button><button type="button" class="btn-delete">删除</button><button type="button" class="btn-create-only">创建单张问卷</button><button type="button" class="btn-create-branch">创建分支问卷</button>
+		</div>
 	  </div>
 	  <!-- /.box-header -->
 	  <div class="box-body table-responsive no-padding">
@@ -52,7 +41,7 @@ $(function(){
 	});
 	$("#checkAllId").change(doChangeTBodyCheckBoxState);
 	$("#tbodyId").on("change", ".quesId", doChangeTHeadCheckBoxState);
-	$(".input-group-btn")
+	$(".box-button")
 		.on("click",".btn-search", doQueryObjects)
 		.on("click",".btn-create-branch", doLoadEditUI)
 		.on("click",".btn-create-only", doLoadEditUI)
