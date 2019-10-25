@@ -3,18 +3,8 @@
     <div class="box">
 	  <div class="box-header">
 	    <h3 class="box-title"></h3>
-	    <div class="box-tools">
-		  <div class="input-group input-group-sm" style="width: 500px;">
-		    <input type="text" name="table_search" id="searchNameId"
-				  class="form-control pull-right" placeholder="问题名称">
-			<div class="input-group-btn">
-			  <button type="button" class="btn btn-default btn-search">
-                <i class="fa fa-search"></i>
-			  </button>
-			  <button type="button" class="btn btn-default btn-submit">确认</button>
-			  <button type="button" class="btn btn-default btn-cancel">返回</button>
-			</div>
-		  </div>
+	    <div class="box-button" style="float:right; border:2px solid #007799;">	
+        	<input type="text" name="table_search" id="searchNameId" placeholder="问题名称"><button type="button" class="btn-search"><i class="fa fa-search"></i></button><button type="button" class="btn-submit">确认</button><button type="button" class="btn-cancel">返回</button>
 	    </div>
 	  </div>
 	  <!-- /.box-header -->
@@ -22,11 +12,11 @@
 	    <table class="table table-hover text-center">
 	      <thead>
 		    <tr>
-		      <th><input type="checkbox" id="checkAllId">全选</th>
-		      <th>编号</th>
-			  <th>问题类型</th>
+		      <th style="width:60px; text-align:left;"><input type="checkbox" id="checkAllId">全选</th>
+		      <th style="width:60px;">编号</th>
+			  <th style="width:100px;">问题类型</th>
 			  <th>问题名称</th>
-			  <th>创建日期</th>
+			  <th style="width:200px;">创建日期</th>
 		    </tr>
 		  </thead>
 		  <tbody id="tbodyId"></tbody>
@@ -42,14 +32,12 @@
 <!-- /.row -->
 <script type="text/javascript">
 $(function(){
-	//加载分页组件
 	$("#pageId").load("doPageUI", function(){
-		//加载页面数据
 		doGetObjects();
 	});
 	$("#checkAllId").change(doChangeTBodyCheckBoxState);
 	$("#tbodyId").on("change", ".quesId", doChangeTHeadCheckBoxState);
-	$(".input-group-btn")
+	$(".box-button")
 		.on("click",".btn-search", doQueryObjects)
 		.on("click",".btn-submit", doSelectQues)
 		.on("click",".btn-cancel", doCancel);
@@ -96,7 +84,6 @@ function doHandleResponseResult(result){
 		alert(result.message);
 	}
 }
-//返回数据初始化页面
 function doSetTableBodyRows(data){
 	var tBody = $("#tbodyId");
 	tBody.empty();
@@ -124,10 +111,10 @@ function doCreateTds(data){
 		type = "简答题";
 	}
 	var tds=
-		"<td><input type='checkbox' name='quesId' class='quesId' value='"+data.quesId+"'><span class='numberClass'></span></td>"+
+		"<td style='text-align:left;'><input type='checkbox' name='quesId' class='quesId' value='"+data.quesId+"'><span class='numberClass'></span></td>"+
 		"<td>"+data.quesId+"</td>"+
 		"<td>"+type+"</td>"+
-	    "<td><input type='submit' style='width:600px;' value='"+data.quesName+"' onclick='doGetQuesOption("+data.quesId+")'></td>"+
+	    "<td style='text-align:left;'><a onclick='doGetQuesOption("+data.quesId+")'>"+data.quesName+"</a></td>"+
 	    "<td>"+data.createTime+"</td>";
     return tds;
 }
