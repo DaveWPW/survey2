@@ -19,7 +19,7 @@
         <druid-spring-boot-starter.version>1.1.10</druid-spring-boot-starter.version>
         <mybatis-spring-boot-starter.version>2.0.1</mybatis-spring-boot-starter.version>
         <shiro-spring.version>1.4.0</shiro-spring.version>
-        <poi.version>3.16</poi.version>
+        <poi.version>4.1.1</poi.version>
         <poi-ooxml.version>3.14</poi-ooxml.version>
         <commons-fileupload.version>1.3.1</commons-fileupload.version>
         <commons-io.version>2.4</commons-io.version>
